@@ -48,83 +48,29 @@ h1,h2,h3,.tabular{
 
 a{color:inherit}
 
-:focus-visible{
-    outline:2px solid var(--signal);
-    outline-offset:3px;
-    border-radius:6px;
-}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
 
-.wrap{
-    max-width:1180px;
-    margin:0 auto;
-    padding:0 22px;
-}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
 
 /* ---------- barra superior ---------- */
 
 .topbar{
-    position:sticky;
-    top:0;
-    z-index:60;
+    position:sticky;top:0;z-index:60;
     background:rgba(6,10,14,.9);
     backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line-soft);
 }
 
-.topbar .wrap{
-    display:flex;
-    align-items:center;
-    gap:24px;
-    height:66px;
-}
+.topbar .wrap{display:flex;align-items:center;gap:24px;height:66px}
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:11px;
-    text-decoration:none;
-    flex:0 0 auto;
-}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;flex:0 0 auto}
+.brand img{width:38px;height:38px;display:block}
+.brand b{font-family:"Barlow Condensed",sans-serif;font-size:23px;font-weight:700;letter-spacing:.02em}
+.brand small{display:block;font-family:"Inter",sans-serif;font-size:10px;font-weight:500;letter-spacing:.22em;color:var(--ink-faint)}
 
-.brand img{
-    width:38px;
-    height:38px;
-    display:block;
-}
-
-.brand b{
-    font-family:"Barlow Condensed",sans-serif;
-    font-size:23px;
-    font-weight:700;
-    letter-spacing:.02em;
-}
-
-.brand small{
-    display:block;
-    font-family:"Inter",sans-serif;
-    font-size:10px;
-    font-weight:500;
-    letter-spacing:.22em;
-    color:var(--ink-faint);
-}
-
-.menu{
-    display:flex;
-    gap:4px;
-    margin-left:auto;
-    overflow-x:auto;
-    scrollbar-width:none;
-}
+.menu{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
 .menu::-webkit-scrollbar{display:none}
-
-.menu a{
-    color:var(--ink-dim);
-    text-decoration:none;
-    font-size:14px;
-    padding:8px 12px;
-    border-radius:8px;
-    white-space:nowrap;
-}
+.menu a{color:var(--ink-dim);text-decoration:none;font-size:14px;padding:8px 12px;border-radius:8px;white-space:nowrap}
 .menu a:hover{color:var(--ink);background:var(--surface-2)}
 
 .clock{
@@ -139,92 +85,27 @@ a{color:inherit}
 
 /* ---------- emisión ---------- */
 
-.broadcast{
-    padding:26px 0 10px;
-}
+.broadcast{padding:26px 0 10px}
 
-.broadcast-grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 330px;
-    gap:22px;
-    align-items:start;
-}
+.broadcast-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 
-.stage{
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    overflow:hidden;
-    background:#000;
-}
+.stage{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#000}
 
-.screen{
-    position:relative;
-    aspect-ratio:16/9;
-    background:#000;
-}
+.screen{position:relative;aspect-ratio:16/9;background:#000}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
-.screen iframe{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    border:0;
-}
-
-.screen-empty{
-    position:absolute;
-    inset:0;
-    display:grid;
-    place-content:center;
-    text-align:center;
-    color:var(--ink-faint);
-    gap:10px;
-}
-
+.screen-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--ink-faint);gap:10px}
 .screen-empty img{width:54px;height:54px;margin:0 auto;opacity:.75}
 
-.bar{
-    height:3px;
-    background:var(--line-soft);
-}
+.bar{height:3px;background:var(--line-soft)}
+.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--signal),var(--signal-2));transition:width 1s linear}
 
-.bar span{
-    display:block;
-    height:100%;
-    width:0;
-    background:linear-gradient(90deg,var(--signal),var(--signal-2));
-    transition:width 1s linear;
-}
-
-.now{
-    padding:18px 20px 20px;
-    background:var(--surface);
-    display:flex;
-    gap:18px;
-    align-items:flex-start;
-    flex-wrap:wrap;
-}
-
+.now{padding:18px 20px 20px;background:var(--surface);display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
 .now-main{flex:1 1 260px;min-width:0}
 
-.onair{
-    display:inline-flex;
-    align-items:center;
-    gap:7px;
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:.18em;
-    color:var(--on-air);
-    margin-bottom:9px;
-}
+.onair{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--on-air);margin-bottom:9px}
 
-.dot{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--on-air);
-    box-shadow:0 0 0 0 rgba(255,59,92,.6);
-    animation:pulse 2.4s infinite;
-}
-
+.dot{width:7px;height:7px;border-radius:50%;background:var(--on-air);animation:pulse 2.4s infinite}
 @keyframes pulse{
     0%{box-shadow:0 0 0 0 rgba(255,59,92,.55)}
     70%{box-shadow:0 0 0 9px rgba(255,59,92,0)}
@@ -233,74 +114,22 @@ a{color:inherit}
 
 .now h2{font-size:30px;margin-bottom:6px}
 .now p{color:var(--ink-dim);font-size:14.5px}
+.now-meta{font-family:"Barlow Condensed",sans-serif;font-size:15px;color:var(--ink-faint);font-variant-numeric:tabular-nums;margin-top:8px}
 
-.now-meta{
-    font-family:"Barlow Condensed",sans-serif;
-    font-size:15px;
-    color:var(--ink-faint);
-    font-variant-numeric:tabular-nums;
-    margin-top:8px;
-}
-
-.sound{
-    flex:0 0 auto;
-    background:transparent;
-    border:1px solid var(--line);
-    color:var(--ink);
-    font:inherit;
-    font-size:13.5px;
-    padding:9px 15px;
-    border-radius:999px;
-    cursor:pointer;
-}
+.sound{flex:0 0 auto;background:transparent;border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13.5px;padding:9px 15px;border-radius:999px;cursor:pointer}
 .sound:hover{border-color:var(--signal);color:var(--signal)}
 
-/* ---------- columna "a continuación" ---------- */
+/* ---------- a continuación ---------- */
 
-.upnext{
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    background:var(--surface);
-    padding:20px;
-}
-
-.upnext-head{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:14px;
-}
-
+.upnext{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:20px}
+.upnext-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
 .upnext-head h3{font-size:21px}
-
-.upnext-head em{
-    font-style:normal;
-    font-family:"Barlow Condensed",sans-serif;
-    font-size:24px;
-    color:var(--signal);
-    font-variant-numeric:tabular-nums;
-}
+.upnext-head em{font-style:normal;font-family:"Barlow Condensed",sans-serif;font-size:24px;color:var(--signal);font-variant-numeric:tabular-nums}
 
 .queue{list-style:none;display:grid;gap:2px}
-
-.queue li{
-    display:grid;
-    grid-template-columns:52px 1fr;
-    gap:12px;
-    padding:11px 0;
-    border-top:1px solid var(--line-soft);
-    align-items:baseline;
-}
+.queue li{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line-soft);align-items:baseline}
 .queue li:first-child{border-top:0}
-
-.queue time{
-    font-family:"Barlow Condensed",sans-serif;
-    font-size:18px;
-    color:var(--signal-2);
-    font-variant-numeric:tabular-nums;
-}
-
+.queue time{font-family:"Barlow Condensed",sans-serif;font-size:17px;color:var(--signal-2);font-variant-numeric:tabular-nums}
 .queue b{font-weight:600;font-size:14.5px;display:block}
 .queue span{font-size:12.5px;color:var(--ink-faint)}
 
@@ -308,219 +137,80 @@ a{color:inherit}
 
 .section{padding:52px 0 0}
 
-.section-head{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:18px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-    padding-bottom:14px;
-    border-bottom:1px solid var(--line-soft);
-}
-
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--line-soft)}
 .section-head h2{font-size:34px}
-.section-head p{color:var(--ink-dim);font-size:14.5px;max-width:52ch}
+.section-head p{color:var(--ink-dim);font-size:14.5px;max-width:56ch}
 
-.tools{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-    margin-bottom:18px;
-}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
 
-.field{
-    flex:1 1 260px;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:0 13px;
-}
-
-.field input{
-    flex:1;
-    background:none;
-    border:0;
-    outline:none;
-    color:var(--ink);
-    font:inherit;
-    font-size:14.5px;
-    padding:12px 0;
-}
+.field{flex:1 1 260px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 13px}
+.field input{flex:1;background:none;border:0;outline:none;color:var(--ink);font:inherit;font-size:14.5px;padding:12px 0}
 .field:focus-within{border-color:var(--signal)}
 
-.chip{
-    background:var(--surface);
-    border:1px solid var(--line);
-    color:var(--ink-dim);
-    font:inherit;
-    font-size:13.5px;
-    padding:9px 14px;
-    border-radius:999px;
-    cursor:pointer;
-}
+.chip{background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);font:inherit;font-size:13.5px;padding:9px 14px;border-radius:999px;cursor:pointer}
 .chip:hover{color:var(--ink)}
-.chip[aria-pressed="true"]{
-    background:var(--signal);
-    border-color:var(--signal);
-    color:#00201b;
-    font-weight:600;
-}
+.chip[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:#00201b;font-weight:600}
 
-.grid{
-    border-top:1px solid var(--line-soft);
-}
+.grid{border-top:1px solid var(--line-soft)}
 
 .slot{
     display:grid;
-    grid-template-columns:86px 34px 1fr auto;
-    gap:16px;
+    grid-template-columns:78px 62px 30px 1fr auto;
+    gap:14px;
     align-items:center;
     width:100%;
     text-align:left;
-    background:none;
-    border:0;
+    background:none;border:0;
     border-bottom:1px solid var(--line-soft);
-    color:inherit;
-    font:inherit;
-    padding:14px 10px;
+    color:inherit;font:inherit;
+    padding:13px 10px;
     cursor:pointer;
 }
 .slot:hover{background:var(--surface)}
 
-.slot time{
-    font-family:"Barlow Condensed",sans-serif;
-    font-size:19px;
-    color:var(--ink-dim);
-    font-variant-numeric:tabular-nums;
-}
-
-.slot .ico{font-size:22px;text-align:center}
+.slot time{font-family:"Barlow Condensed",sans-serif;font-size:19px;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.slot .dur{font-size:12px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.slot .ico{font-size:21px;text-align:center}
 .slot h4{font-size:15.5px;font-weight:600}
 .slot p{font-size:13px;color:var(--ink-faint);margin-top:2px}
-
-.slot .cat{
-    font-size:11px;
-    letter-spacing:.06em;
-    color:var(--ink-faint);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:4px 9px;
-    white-space:nowrap;
-}
+.slot .cat{font-size:11px;letter-spacing:.06em;color:var(--ink-faint);border:1px solid var(--line);border-radius:6px;padding:4px 9px;white-space:nowrap}
 
 .slot.is-past{opacity:.42}
-
-.slot.is-live{
-    background:linear-gradient(90deg,rgba(0,229,192,.10),transparent 60%);
-    border-left:2px solid var(--signal);
-    padding-left:8px;
-}
+.slot.is-live{background:linear-gradient(90deg,rgba(0,229,192,.10),transparent 60%);border-left:2px solid var(--signal);padding-left:8px}
 .slot.is-live time{color:var(--signal)}
 .slot.is-live .cat{border-color:var(--signal);color:var(--signal)}
-
 .slot.is-ad h4{color:var(--ink-dim);font-weight:500}
 
-.more{
-    display:block;
-    margin:22px auto 0;
-    background:var(--surface);
-    border:1px solid var(--line);
-    color:var(--ink);
-    font:inherit;
-    font-size:14px;
-    padding:11px 24px;
-    border-radius:999px;
-    cursor:pointer;
-}
+.more{display:block;margin:22px auto 0;background:var(--surface);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:14px;padding:11px 24px;border-radius:999px;cursor:pointer}
 .more:hover{border-color:var(--signal);color:var(--signal)}
 
-.empty{
-    padding:38px 10px;
-    color:var(--ink-dim);
-    font-size:14.5px;
-}
+.empty{padding:38px 10px;color:var(--ink-dim);font-size:14.5px}
 
-/* ---------- destacados ---------- */
+/* ---------- producciones ---------- */
 
-.shows{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:18px;
-}
-
-.show{
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:24px;
-    background:var(--surface);
-}
-
+.shows{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.show{border:1px solid var(--line);border-radius:var(--radius);padding:24px;background:var(--surface)}
 .show .ico{font-size:34px;display:block;margin-bottom:14px}
 .show h3{font-size:22px;margin-bottom:6px}
 .show p{color:var(--ink-dim);font-size:14px}
 
 /* ---------- canal ---------- */
 
-.about{
-    display:grid;
-    grid-template-columns:1.1fr 1fr;
-    gap:34px;
-    align-items:start;
-}
-
+.about{display:grid;grid-template-columns:1.1fr 1fr;gap:34px;align-items:start}
 .about p{color:var(--ink-dim);margin-bottom:14px;max-width:62ch}
 
 .facts{list-style:none;border-top:1px solid var(--line-soft)}
-
-.facts li{
-    display:flex;
-    justify-content:space-between;
-    gap:14px;
-    padding:13px 0;
-    border-bottom:1px solid var(--line-soft);
-    font-size:14px;
-    color:var(--ink-dim);
-}
-.facts b{color:var(--ink);font-weight:600}
+.facts li{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--line-soft);font-size:14px;color:var(--ink-dim)}
+.facts b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 
 /* ---------- pie ---------- */
 
-footer{
-    margin-top:64px;
-    border-top:1px solid var(--line-soft);
-    padding:30px 0;
-}
-
-footer .wrap{
-    display:flex;
-    justify-content:space-between;
-    gap:16px;
-    flex-wrap:wrap;
-    color:var(--ink-faint);
-    font-size:13.5px;
-}
+footer{margin-top:64px;border-top:1px solid var(--line-soft);padding:30px 0}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--ink-faint);font-size:13.5px}
 
 /* ---------- aviso ---------- */
 
-.toast{
-    position:fixed;
-    left:50%;
-    bottom:24px;
-    transform:translate(-50%,140%);
-    background:var(--surface-2);
-    border:1px solid var(--signal);
-    color:var(--ink);
-    padding:12px 20px;
-    border-radius:999px;
-    font-size:14px;
-    z-index:90;
-    transition:transform .28s ease;
-}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);background:var(--surface-2);border:1px solid var(--signal);color:var(--ink);padding:12px 20px;border-radius:999px;font-size:14px;z-index:90;transition:transform .28s ease}
 .toast.show{transform:translate(-50%,0)}
 
 @media(max-width:960px){
@@ -535,8 +225,9 @@ footer .wrap{
     .menu{order:3;width:100%;margin-left:0}
     .now h2{font-size:25px}
     .section-head h2{font-size:28px}
-    .slot{grid-template-columns:62px 1fr;gap:10px;padding:13px 6px}
+    .slot{grid-template-columns:74px 1fr;gap:8px;padding:13px 6px}
     .slot .ico{display:none}
+    .slot .dur{grid-column:1;color:var(--ink-faint)}
     .slot .cat{grid-column:2;justify-self:start;margin-top:6px}
 }
 
@@ -572,7 +263,6 @@ footer .wrap{
 
 <main>
 
-<!-- EMISIÓN -->
 <section class="broadcast" id="emision">
     <div class="wrap">
         <div class="broadcast-grid">
@@ -591,7 +281,7 @@ footer .wrap{
                     <div class="now-main">
                         <div class="onair"><span class="dot"></span>EN VIVO</div>
                         <h2 id="nowTitle">Sintonizando…</h2>
-                        <p id="nowDesc">La programación se calcula con la hora de tu dispositivo.</p>
+                        <p id="nowDesc">La emisión se calcula con la hora de tu dispositivo.</p>
                         <div class="now-meta tabular" id="nowMeta">—</div>
                     </div>
                     <button class="sound" id="sound">Activar sonido</button>
@@ -610,13 +300,12 @@ footer .wrap{
     </div>
 </section>
 
-<!-- PARRILLA -->
 <section class="section" id="parrilla">
     <div class="wrap">
         <div class="section-head">
             <div>
                 <h2>Parrilla del día</h2>
-                <p>Ciclo continuo de 24 horas: 11 minutos de programa y 4 de publicidad. El Himno Nacional abre la emisión a las 00:00.</p>
+                <p>Cada programa ocupa exactamente su duración real, con un corte de 2:42 entre uno y otro. El Himno Nacional abre la emisión a las 00:00.</p>
             </div>
             <button class="chip" id="goNow" type="button">Ir a lo que se emite ahora</button>
         </div>
@@ -638,7 +327,6 @@ footer .wrap{
     </div>
 </section>
 
-<!-- PRODUCCIONES -->
 <section class="section" id="producciones">
     <div class="wrap">
         <div class="section-head">
@@ -652,23 +340,22 @@ footer .wrap{
             <article class="show">
                 <span class="ico" aria-hidden="true">🥖</span>
                 <h3>Pan de Muerto</h3>
-                <p>Documental original sobre el pan que acompaña a los muertos, con tráiler remasterizado en la parrilla.</p>
+                <p>Documental original de siete minutos sobre el pan que acompaña a los muertos, con tráiler remasterizado en la parrilla.</p>
             </article>
             <article class="show">
                 <span class="ico" aria-hidden="true">🕹️</span>
                 <h3>La Simulación</h3>
-                <p>Relato construido en pixel art, cuadro a cuadro, sobre una realidad que no termina de encajar.</p>
+                <p>Relato en pixel art, cuadro a cuadro, sobre una realidad que no termina de encajar.</p>
             </article>
             <article class="show">
                 <span class="ico" aria-hidden="true">🚗</span>
                 <h3>Carros Stop Motion</h3>
-                <p>Animación hecha con objetos reales y mucha paciencia: miles de fotos para unos minutos de viaje.</p>
+                <p>Animación hecha con objetos reales y mucha paciencia: miles de fotos para un minuto y medio de viaje.</p>
             </article>
         </div>
     </div>
 </section>
 
-<!-- CANAL -->
 <section class="section" id="canal">
     <div class="wrap">
         <div class="section-head">
@@ -681,15 +368,15 @@ footer .wrap{
         <div class="about">
             <div>
                 <p>Cine Laptop TV reúne esas producciones en una señal continua. No hay que elegir qué ver: el canal ya está al aire y cambia solo, con cortes publicitarios entre programa y programa, igual que la televisión de siempre.</p>
-                <p>La emisión se calcula con el reloj de tu dispositivo, así que lo que aparece en pantalla coincide con la parrilla de abajo. A medianoche entra el Himno Nacional Mexicano y arranca de nuevo el ciclo del día.</p>
+                <p>La emisión se calcula con el reloj de tu dispositivo y cada video entra en el minuto y segundo que le toca, así que si llegas a mitad de un programa lo verás justo por donde va. A medianoche entra el Himno Nacional Mexicano y arranca de nuevo el ciclo del día.</p>
             </div>
 
             <ul class="facts">
                 <li><span>Al aire</span> <b>24 horas</b></li>
-                <li><span>Duración de cada programa</span> <b>11 minutos</b></li>
-                <li><span>Corte publicitario</span> <b>4 minutos</b></li>
-                <li><span>Bloques por día</span> <b id="factBloques">—</b></li>
                 <li><span>Apertura</span> <b>00:00 · Himno Nacional</b></li>
+                <li><span>Corte publicitario</span> <b>2:42</b></li>
+                <li><span>Producciones en rotación</span> <b id="factTitulos">—</b></li>
+                <li><span>Emisiones por día</span> <b id="factBloques">—</b></li>
             </ul>
         </div>
     </div>
@@ -709,106 +396,142 @@ footer .wrap{
 <script>
 /* =========================================================
    CINE LAPTOP TV — señal continua de 24 horas
-   Bloque = 11 min de programa + 4 min de publicidad (15 min)
-   96 bloques exactos por día. El bloque 1 es el Himno.
+
+   Cada programa ocupa su duración real (en segundos) y entre
+   uno y otro entra el corte publicitario. Si quieres cambiar
+   una duración, edita solo el campo "dur" de ese programa.
 ========================================================= */
 
-const DUR_PROGRAMA = 11;
-const DUR_PUBLICIDAD = 4;
-const DUR_BLOQUE = DUR_PROGRAMA + DUR_PUBLICIDAD;   // 15
-const BLOQUES_DIA = (24 * 60) / DUR_BLOQUE;         // 96
+const DIA = 86400;
 
-const PUBLICIDAD_URL = "https://www.youtube.com/embed/8V-Vq2g8Ju4";
+/* Duración de la publicidad: 2:42 */
+const PUBLICIDAD = {
+    titulo:"Publicidad",
+    descripcion:"Corte publicitario de Cine Laptop TV.",
+    categoria:"Publicidad",
+    icono:"📢",
+    url:"https://www.youtube.com/embed/8V-Vq2g8Ju4",
+    dur: 2*60 + 42,
+    anuncio:true
+};
 
+/* 00:00 — Himno Nacional, 10 minutos */
 const HIMNO = {
     titulo:"Himno Nacional Mexicano",
     descripcion:"Apertura de la emisión. El canal abre el día con el Himno Nacional.",
     categoria:"Especial",
     icono:"🇲🇽",
-    url:"https://www.youtube.com/embed/DOAFBiPFOWE"
+    url:"https://www.youtube.com/embed/DOAFBiPFOWE",
+    dur: 10*60
 };
 
 const CATALOGO = [
-    { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental", icono:"🥖", url:"https://www.youtube.com/embed/5X8gx_yEFLg" },
-    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental", icono:"🎞️", url:"https://www.youtube.com/embed/DZT6qLmZT_0" },
-    { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine", icono:"🎬", url:"https://www.youtube.com/embed/MyY0r5QoIwY" },
-    { titulo:"Pancracio 2", descripcion:"Continuación de la serie Pancracio.", categoria:"Cine", icono:"🎬", url:"https://www.youtube.com/embed/JkZ51R-z30o" },
-    { titulo:"Lavar los platos", descripcion:"Cortometraje de Cine Laptop.", categoria:"Cine", icono:"🍽️", url:"https://www.youtube.com/embed/XG2CLA7uuzs" },
-    { titulo:"Carros Stop Motion", descripcion:"Animación cuadro por cuadro con autos de juguete.", categoria:"Cine", icono:"🚗", url:"https://www.youtube.com/embed/dxqasHpvR-c" },
-    { titulo:"La Simulación", descripcion:"Relato en pixel art sobre una realidad que falla.", categoria:"Cine", icono:"🕹️", url:"https://www.youtube.com/embed/pokEncxip4I" },
-    { titulo:"Tender la cama", descripcion:"Stop motion doméstico de Cine Laptop.", categoria:"Cine", icono:"🛏️", url:"https://www.youtube.com/embed/sjFXZRWHuQY" },
-    { titulo:"Nocturne", descripcion:"Pieza nocturna de Cine Laptop.", categoria:"Cine", icono:"🌙", url:"https://www.youtube.com/embed/hYmyKxIMozY" },
-    { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine", icono:"🍲", url:"https://www.youtube.com/embed/z8UWk_M1bJA" }
+    { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental", icono:"🥖",
+      url:"https://www.youtube.com/embed/5X8gx_yEFLg", dur: 7*60 + 12 },
+
+    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental", icono:"🎞️",
+      url:"https://www.youtube.com/embed/DZT6qLmZT_0", dur: 6*60 + 41 },
+
+    { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine", icono:"🎬",
+      url:"https://www.youtube.com/embed/MyY0r5QoIwY", dur: 3*60 + 55 },
+
+    { titulo:"Pancracio 2", descripcion:"Continuación de la serie Pancracio.", categoria:"Cine", icono:"🎬",
+      url:"https://www.youtube.com/embed/JkZ51R-z30o", dur: 7*60 + 7 },
+
+    /* ⚠️ Duración provisional: no me diste la de este corto. Cambia el 60 por los segundos reales. */
+    { titulo:"Lavar los platos", descripcion:"Cortometraje de Cine Laptop.", categoria:"Cine", icono:"🍽️",
+      url:"https://www.youtube.com/embed/XG2CLA7uuzs", dur: 60 },
+
+    { titulo:"Carros Stop Motion", descripcion:"Animación cuadro por cuadro con autos de juguete.", categoria:"Cine", icono:"🚗",
+      url:"https://www.youtube.com/embed/dxqasHpvR-c", dur: 1*60 + 27 },
+
+    { titulo:"La Simulación", descripcion:"Relato en pixel art sobre una realidad que falla.", categoria:"Cine", icono:"🕹️",
+      url:"https://www.youtube.com/embed/pokEncxip4I", dur: 4*60 + 6 },
+
+    { titulo:"Tender la cama", descripcion:"Stop motion doméstico de Cine Laptop.", categoria:"Cine", icono:"🛏️",
+      url:"https://www.youtube.com/embed/sjFXZRWHuQY", dur: 50 },
+
+    { titulo:"Nocturne", descripcion:"Pieza nocturna de Cine Laptop.", categoria:"Cine", icono:"🌙",
+      url:"https://www.youtube.com/embed/hYmyKxIMozY", dur: 52 },
+
+    { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine", icono:"🍲",
+      url:"https://www.youtube.com/embed/z8UWk_M1bJA", dur: 12 }
 ];
 
 /* ---------- armado de la parrilla ---------- */
 
-const hhmm = m => String(Math.floor(m / 60) % 24).padStart(2,"0") + ":" + String(m % 60).padStart(2,"0");
-
 const parrilla = [];
+let cursor = 0;
 
-for (let b = 0; b < BLOQUES_DIA; b++){
-    const inicio = b * DUR_BLOQUE;
-    const base = b === 0 ? HIMNO : CATALOGO[(b - 1) % CATALOGO.length];
-
+function agendar(base){
+    if (cursor >= DIA) return;
     parrilla.push({
-        inicio,
-        fin: inicio + DUR_PROGRAMA,
         titulo: base.titulo,
         descripcion: base.descripcion,
         categoria: base.categoria,
         icono: base.icono,
         url: base.url,
-        anuncio: false
+        anuncio: !!base.anuncio,
+        dur: base.dur,
+        inicio: cursor,
+        fin: Math.min(cursor + base.dur, DIA)
     });
-
-    parrilla.push({
-        inicio: inicio + DUR_PROGRAMA,
-        fin: inicio + DUR_BLOQUE,
-        titulo:"Publicidad",
-        descripcion:"Corte publicitario de Cine Laptop TV.",
-        categoria:"Publicidad",
-        icono:"📢",
-        url: PUBLICIDAD_URL,
-        anuncio: true
-    });
+    cursor = Math.min(cursor + base.dur, DIA);
 }
 
-document.getElementById("factBloques").textContent = BLOQUES_DIA + " bloques";
+agendar(HIMNO);
+agendar(PUBLICIDAD);
 
-/* ---------- reloj y posición en la parrilla ---------- */
+let vuelta = 0;
+while (cursor < DIA){
+    agendar(CATALOGO[vuelta % CATALOGO.length]);
+    if (cursor < DIA) agendar(PUBLICIDAD);
+    vuelta++;
+}
+
+document.getElementById("factTitulos").textContent = (CATALOGO.length + 1) + " títulos";
+document.getElementById("factBloques").textContent = parrilla.filter(p => !p.anuncio).length + " emisiones";
+
+/* ---------- tiempo ---------- */
+
+const dosDig = n => String(n).padStart(2,"0");
+const reloj = s => dosDig(Math.floor(s/3600)%24) + ":" + dosDig(Math.floor(s/60)%60) + ":" + dosDig(s%60);
+const corto = s => dosDig(Math.floor(s/3600)%24) + ":" + dosDig(Math.floor(s/60)%60);
+const largo = s => Math.floor(s/60) + ":" + dosDig(s%60);
 
 const ahora = () => {
     const d = new Date();
-    return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+    return d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds();
 };
 
 const indiceActual = () => {
     const s = ahora();
-    const i = parrilla.findIndex(p => s >= p.inicio * 60 && s < p.fin * 60);
-    return i === -1 ? 0 : i;
+    const i = parrilla.findIndex(p => s >= p.inicio && s < p.fin);
+    return i === -1 ? parrilla.length - 1 : i;
 };
 
 /* ---------- reproductor ---------- */
 
 const idDe = url => (url.match(/embed\/([\w-]+)/) || [,""])[1];
 
-function fuente(url, conSonido){
+function fuente(url, conSonido, desde){
     const id = idDe(url);
     return "https://www.youtube.com/embed/" + id +
         "?autoplay=1&mute=" + (conSonido ? 0 : 1) +
-        "&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=" + id;
+        "&rel=0&modestbranding=1&playsinline=1&start=" + Math.max(0, Math.floor(desde || 0));
 }
 
 const screen = document.getElementById("screen");
 let conSonido = false;
 let enPantalla = null;
+let desdePantalla = 0;
 
-function reproducir(programa){
+function reproducir(programa, desde){
     enPantalla = programa;
+    desdePantalla = desde || 0;
     screen.innerHTML = "";
     const f = document.createElement("iframe");
-    f.src = fuente(programa.url, conSonido);
+    f.src = fuente(programa.url, conSonido, desdePantalla);
     f.title = programa.titulo;
     f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     f.referrerPolicy = "strict-origin-when-cross-origin";
@@ -819,7 +542,13 @@ function reproducir(programa){
 document.getElementById("sound").addEventListener("click", e => {
     conSonido = !conSonido;
     e.currentTarget.textContent = conSonido ? "Silenciar" : "Activar sonido";
-    if (enPantalla) reproducir(enPantalla);
+    if (enPantalla){
+        /* al reactivar el sonido, se reengancha con el punto exacto de la emisión */
+        const i = indiceActual();
+        const p = parrilla[i];
+        if (!modoManual && p === parrilla[indiceEnAire]) reproducir(p, ahora() - p.inicio);
+        else reproducir(enPantalla, desdePantalla);
+    }
 });
 
 /* ---------- señal en vivo ---------- */
@@ -835,43 +564,38 @@ function actualizarSenal(){
 
     if (i !== indiceEnAire){
         indiceEnAire = i;
-        if (!modoManual) reproducir(p);
+        if (!modoManual) reproducir(p, ahora() - p.inicio);
         pintarParrilla();
     }
 
     if (!modoManual){
         $("nowTitle").textContent = p.titulo;
         $("nowDesc").textContent = p.descripcion;
-        $("nowMeta").textContent = hhmm(p.inicio) + " – " + hhmm(p.fin) + " · " + p.categoria;
+        $("nowMeta").textContent = reloj(p.inicio) + " – " + reloj(p.fin) + " · " + largo(p.dur) + " · " + p.categoria;
     }
 
     const s = ahora();
-    const avance = (s - p.inicio * 60) / ((p.fin - p.inicio) * 60);
-    $("progress").style.width = Math.min(100, Math.max(0, avance * 100)) + "%";
+    const avance = (s - p.inicio) / Math.max(1, p.fin - p.inicio);
+    $("progress").style.width = Math.min(100, Math.max(0, avance*100)) + "%";
 
-    const restante = p.fin * 60 - s;
-    $("countdown").textContent =
-        String(Math.floor(restante / 60)).padStart(2,"0") + ":" +
-        String(Math.floor(restante % 60)).padStart(2,"0");
+    const restante = Math.max(0, p.fin - s);
+    $("countdown").textContent = dosDig(Math.floor(restante/60)) + ":" + dosDig(restante%60);
 
     const cola = [];
     for (let k = 1; k <= 4; k++) cola.push(parrilla[(i + k) % parrilla.length]);
 
     $("queue").innerHTML = cola.map(x => `
         <li>
-            <time>${hhmm(x.inicio)}</time>
+            <time>${reloj(x.inicio)}</time>
             <div>
                 <b>${x.icono} ${x.titulo}</b>
-                <span>${x.descripcion}</span>
+                <span>${largo(x.dur)} · ${x.descripcion}</span>
             </div>
         </li>
     `).join("");
 
     const d = new Date();
-    $("clock").textContent =
-        String(d.getHours()).padStart(2,"0") + ":" +
-        String(d.getMinutes()).padStart(2,"0") + ":" +
-        String(d.getSeconds()).padStart(2,"0");
+    $("clock").textContent = dosDig(d.getHours()) + ":" + dosDig(d.getMinutes()) + ":" + dosDig(d.getSeconds());
 }
 
 /* ---------- parrilla en pantalla ---------- */
@@ -904,7 +628,7 @@ function pintarParrilla(){
     const enAire = indiceActual();
 
     if (!lista.length){
-        grid.innerHTML = `<p class="empty">No hay programas con ese nombre. Prueba con otra palabra o vuelve a “Todos”.</p>`;
+        grid.innerHTML = '<p class="empty">No hay programas con ese nombre. Prueba con otra palabra o vuelve a “Todos”.</p>';
         more.hidden = true;
         return;
     }
@@ -913,7 +637,8 @@ function pintarParrilla(){
         const estado = p.i === enAire ? "is-live" : (p.i < enAire && !desdeAhora ? "is-past" : "");
         return `
         <button class="slot ${estado} ${p.anuncio ? "is-ad" : ""}" data-i="${p.i}" type="button">
-            <time>${hhmm(p.inicio)} – ${hhmm(p.fin)}</time>
+            <time>${reloj(p.inicio)}</time>
+            <span class="dur">${largo(p.dur)}</span>
             <span class="ico" aria-hidden="true">${p.icono}</span>
             <span>
                 <h4>${p.titulo}</h4>
@@ -931,17 +656,18 @@ grid.addEventListener("click", e => {
     const boton = e.target.closest(".slot");
     if (!boton) return;
 
-    const p = parrilla[Number(boton.dataset.i)];
-    const enAire = Number(boton.dataset.i) === indiceActual();
+    const idx = Number(boton.dataset.i);
+    const p = parrilla[idx];
+    const enAire = idx === indiceActual();
 
     modoManual = !enAire;
-    reproducir(p);
+    reproducir(p, enAire ? ahora() - p.inicio : 0);
 
     $("nowTitle").textContent = p.titulo;
     $("nowDesc").textContent = p.descripcion;
     $("nowMeta").textContent = enAire
-        ? hhmm(p.inicio) + " – " + hhmm(p.fin) + " · " + p.categoria
-        : "Fuera de emisión · " + p.categoria;
+        ? reloj(p.inicio) + " – " + reloj(p.fin) + " · " + largo(p.dur) + " · " + p.categoria
+        : "Fuera de emisión · " + largo(p.dur) + " · " + p.categoria;
 
     aviso(enAire ? "De vuelta a la señal en vivo" : "Reproduciendo: " + p.titulo);
     document.getElementById("emision").scrollIntoView({ block:"start" });
