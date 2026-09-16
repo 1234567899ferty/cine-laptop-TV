@@ -13,17 +13,22 @@
 
 <style>
 :root{
-    --bg:#060a0e;
-    --surface:#0c131a;
-    --surface-2:#111b24;
-    --line:#1c2e38;
-    --line-soft:#152430;
-    --ink:#eef4f7;
-    --ink-dim:#8ca2ae;
-    --ink-faint:#5c707c;
-    --signal:#00e5c0;
-    --signal-2:#2b9dff;
-    --on-air:#ff3b5c;
+    /* paleta 5E244E · AA1C41 · E68457 · FFE8B4 */
+    --plum:#5E244E;
+    --carmin:#AA1C41;
+    --ambar:#E68457;
+    --crema:#FFE8B4;
+
+    --bg:#1e0a1a;
+    --surface:#2c0f26;
+    --surface-2:#3a1531;
+    --line:#5E244E;
+    --line-soft:#3d1633;
+
+    --ink:#FFE8B4;
+    --ink-dim:#c9a98d;
+    --ink-faint:#9c7b73;
+
     --radius:14px;
 }
 
@@ -47,8 +52,7 @@ h1,h2,h3,.tabular{
 }
 
 a{color:inherit}
-
-:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:6px}
+:focus-visible{outline:2px solid var(--ambar);outline-offset:3px;border-radius:6px}
 
 .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
 
@@ -56,11 +60,10 @@ a{color:inherit}
 
 .topbar{
     position:sticky;top:0;z-index:60;
-    background:rgba(6,10,14,.9);
+    background:rgba(30,10,26,.92);
     backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line-soft);
 }
-
 .topbar .wrap{display:flex;align-items:center;gap:24px;height:66px}
 
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;flex:0 0 auto}
@@ -78,7 +81,7 @@ a{color:inherit}
     font-family:"Barlow Condensed",sans-serif;
     font-size:22px;
     font-variant-numeric:tabular-nums;
-    color:var(--signal);
+    color:var(--ambar);
     padding-left:18px;
     border-left:1px solid var(--line);
 }
@@ -86,50 +89,55 @@ a{color:inherit}
 /* ---------- emisión ---------- */
 
 .broadcast{padding:26px 0 10px}
-
 .broadcast-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 
 .stage{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#000}
+.stage:fullscreen{border-radius:0;border:0;display:flex;flex-direction:column;justify-content:center;background:#000}
+.stage:fullscreen .screen{aspect-ratio:auto;flex:1}
+.stage:fullscreen .now{display:none}
 
 .screen{position:relative;aspect-ratio:16/9;background:#000}
 .screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
 .screen-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--ink-faint);gap:10px}
-.screen-empty img{width:54px;height:54px;margin:0 auto;opacity:.75}
+.screen-empty img{width:54px;height:54px;margin:0 auto;opacity:.8}
 
 .bar{height:3px;background:var(--line-soft)}
-.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--signal),var(--signal-2));transition:width 1s linear}
+.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--carmin),var(--ambar));transition:width 1s linear}
 
-.now{padding:18px 20px 20px;background:var(--surface);display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.now{padding:18px 20px 20px;background:var(--surface);display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
 .now-main{flex:1 1 260px;min-width:0}
 
-.onair{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--on-air);margin-bottom:9px}
-
-.dot{width:7px;height:7px;border-radius:50%;background:var(--on-air);animation:pulse 2.4s infinite}
+.onair{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--carmin);margin-bottom:9px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--carmin);animation:pulse 2.4s infinite}
 @keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(255,59,92,.55)}
-    70%{box-shadow:0 0 0 9px rgba(255,59,92,0)}
-    100%{box-shadow:0 0 0 0 rgba(255,59,92,0)}
+    0%{box-shadow:0 0 0 0 rgba(170,28,65,.6)}
+    70%{box-shadow:0 0 0 9px rgba(170,28,65,0)}
+    100%{box-shadow:0 0 0 0 rgba(170,28,65,0)}
 }
 
 .now h2{font-size:30px;margin-bottom:6px}
 .now p{color:var(--ink-dim);font-size:14.5px}
 .now-meta{font-family:"Barlow Condensed",sans-serif;font-size:15px;color:var(--ink-faint);font-variant-numeric:tabular-nums;margin-top:8px}
 
-.sound{flex:0 0 auto;background:transparent;border:1px solid var(--line);color:var(--ink);font:inherit;font-size:13.5px;padding:9px 15px;border-radius:999px;cursor:pointer}
-.sound:hover{border-color:var(--signal);color:var(--signal)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{
+    background:transparent;border:1px solid var(--line);color:var(--ink);
+    font:inherit;font-size:13.5px;padding:9px 15px;border-radius:999px;cursor:pointer;
+}
+.btn:hover{border-color:var(--ambar);color:var(--ambar)}
 
 /* ---------- a continuación ---------- */
 
 .upnext{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:20px}
 .upnext-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
 .upnext-head h3{font-size:21px}
-.upnext-head em{font-style:normal;font-family:"Barlow Condensed",sans-serif;font-size:24px;color:var(--signal);font-variant-numeric:tabular-nums}
+.upnext-head em{font-style:normal;font-family:"Barlow Condensed",sans-serif;font-size:24px;color:var(--ambar);font-variant-numeric:tabular-nums}
 
 .queue{list-style:none;display:grid;gap:2px}
 .queue li{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line-soft);align-items:baseline}
 .queue li:first-child{border-top:0}
-.queue time{font-family:"Barlow Condensed",sans-serif;font-size:17px;color:var(--signal-2);font-variant-numeric:tabular-nums}
+.queue time{font-family:"Barlow Condensed",sans-serif;font-size:17px;color:var(--carmin);font-variant-numeric:tabular-nums}
 .queue b{font-weight:600;font-size:14.5px;display:block}
 .queue span{font-size:12.5px;color:var(--ink-faint)}
 
@@ -142,47 +150,40 @@ a{color:inherit}
 .section-head p{color:var(--ink-dim);font-size:14.5px;max-width:56ch}
 
 .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
-
-.field{flex:1 1 260px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 13px}
+.field{flex:1 1 260px;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 14px}
 .field input{flex:1;background:none;border:0;outline:none;color:var(--ink);font:inherit;font-size:14.5px;padding:12px 0}
-.field:focus-within{border-color:var(--signal)}
+.field input::placeholder{color:var(--ink-faint)}
+.field:focus-within{border-color:var(--ambar)}
 
 .chip{background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);font:inherit;font-size:13.5px;padding:9px 14px;border-radius:999px;cursor:pointer}
 .chip:hover{color:var(--ink)}
-.chip[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:#00201b;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--ambar);border-color:var(--ambar);color:#2c0f26;font-weight:600}
 
 .grid{border-top:1px solid var(--line-soft)}
 
 .slot{
     display:grid;
-    grid-template-columns:78px 62px 30px 1fr auto;
-    gap:14px;
-    align-items:center;
-    width:100%;
-    text-align:left;
-    background:none;border:0;
-    border-bottom:1px solid var(--line-soft);
-    color:inherit;font:inherit;
-    padding:13px 10px;
-    cursor:pointer;
+    grid-template-columns:82px 62px 1fr auto;
+    gap:14px;align-items:center;width:100%;text-align:left;
+    background:none;border:0;border-bottom:1px solid var(--line-soft);
+    color:inherit;font:inherit;padding:13px 10px;cursor:pointer;
 }
 .slot:hover{background:var(--surface)}
 
 .slot time{font-family:"Barlow Condensed",sans-serif;font-size:19px;color:var(--ink-dim);font-variant-numeric:tabular-nums}
 .slot .dur{font-size:12px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
-.slot .ico{font-size:21px;text-align:center}
 .slot h4{font-size:15.5px;font-weight:600}
 .slot p{font-size:13px;color:var(--ink-faint);margin-top:2px}
 .slot .cat{font-size:11px;letter-spacing:.06em;color:var(--ink-faint);border:1px solid var(--line);border-radius:6px;padding:4px 9px;white-space:nowrap}
 
-.slot.is-past{opacity:.42}
-.slot.is-live{background:linear-gradient(90deg,rgba(0,229,192,.10),transparent 60%);border-left:2px solid var(--signal);padding-left:8px}
-.slot.is-live time{color:var(--signal)}
-.slot.is-live .cat{border-color:var(--signal);color:var(--signal)}
+.slot.is-past{opacity:.4}
+.slot.is-live{background:linear-gradient(90deg,rgba(170,28,65,.22),transparent 62%);border-left:2px solid var(--carmin);padding-left:8px}
+.slot.is-live time{color:var(--ambar)}
+.slot.is-live .cat{border-color:var(--carmin);color:var(--ambar)}
 .slot.is-ad h4{color:var(--ink-dim);font-weight:500}
 
 .more{display:block;margin:22px auto 0;background:var(--surface);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:14px;padding:11px 24px;border-radius:999px;cursor:pointer}
-.more:hover{border-color:var(--signal);color:var(--signal)}
+.more:hover{border-color:var(--ambar);color:var(--ambar)}
 
 .empty{padding:38px 10px;color:var(--ink-dim);font-size:14.5px}
 
@@ -190,7 +191,7 @@ a{color:inherit}
 
 .shows{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .show{border:1px solid var(--line);border-radius:var(--radius);padding:24px;background:var(--surface)}
-.show .ico{font-size:34px;display:block;margin-bottom:14px}
+.show .len{display:block;font-family:"Barlow Condensed",sans-serif;font-size:30px;color:var(--ambar);font-variant-numeric:tabular-nums;margin-bottom:10px}
 .show h3{font-size:22px;margin-bottom:6px}
 .show p{color:var(--ink-dim);font-size:14px}
 
@@ -210,7 +211,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
 /* ---------- aviso ---------- */
 
-.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);background:var(--surface-2);border:1px solid var(--signal);color:var(--ink);padding:12px 20px;border-radius:999px;font-size:14px;z-index:90;transition:transform .28s ease}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);background:var(--surface-2);border:1px solid var(--ambar);color:var(--ink);padding:12px 20px;border-radius:999px;font-size:14px;z-index:90;transition:transform .28s ease}
 .toast.show{transform:translate(-50%,0)}
 
 @media(max-width:960px){
@@ -225,9 +226,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     .menu{order:3;width:100%;margin-left:0}
     .now h2{font-size:25px}
     .section-head h2{font-size:28px}
-    .slot{grid-template-columns:74px 1fr;gap:8px;padding:13px 6px}
-    .slot .ico{display:none}
-    .slot .dur{grid-column:1;color:var(--ink-faint)}
+    .slot{grid-template-columns:78px 1fr;gap:8px;padding:13px 6px}
+    .slot .dur{grid-column:1}
     .slot .cat{grid-column:2;justify-self:start;margin-top:6px}
 }
 
@@ -267,7 +267,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <div class="wrap">
         <div class="broadcast-grid">
 
-            <div class="stage">
+            <div class="stage" id="stage">
                 <div class="screen" id="screen">
                     <div class="screen-empty">
                         <img src="https://www.gstatic.com/android/keyboard/emojikitchen/20240530/u1f4bb/u1f4bb_u1f3ac.png" alt="">
@@ -284,7 +284,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
                         <p id="nowDesc">La emisión se calcula con la hora de tu dispositivo.</p>
                         <div class="now-meta tabular" id="nowMeta">—</div>
                     </div>
-                    <button class="sound" id="sound">Activar sonido</button>
+                    <div class="actions">
+                        <button class="btn" id="sound" type="button">Activar sonido</button>
+                        <button class="btn" id="full" type="button">Pantalla completa</button>
+                    </div>
                 </div>
             </div>
 
@@ -305,14 +308,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="section-head">
             <div>
                 <h2>Parrilla del día</h2>
-                <p>Cada programa ocupa exactamente su duración real, con un corte de 2:42 entre uno y otro. El Himno Nacional abre la emisión a las 00:00.</p>
+                <p id="notaDia">Cada programa ocupa su duración real más un margen de 30 segundos, con un corte de 2:42 entre uno y otro.</p>
             </div>
             <button class="chip" id="goNow" type="button">Ir a lo que se emite ahora</button>
         </div>
 
         <div class="tools">
             <label class="field">
-                <span aria-hidden="true">🔎</span>
                 <input id="search" type="search" placeholder="Buscar un programa" aria-label="Buscar un programa">
             </label>
             <button class="chip" data-cat="Todos" aria-pressed="true">Todos</button>
@@ -338,17 +340,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
         <div class="shows">
             <article class="show">
-                <span class="ico" aria-hidden="true">🥖</span>
+                <span class="len tabular">7:12</span>
                 <h3>Pan de Muerto</h3>
-                <p>Documental original de siete minutos sobre el pan que acompaña a los muertos, con tráiler remasterizado en la parrilla.</p>
+                <p>Documental original sobre el pan que acompaña a los muertos, con tráiler remasterizado en la parrilla.</p>
             </article>
             <article class="show">
-                <span class="ico" aria-hidden="true">🕹️</span>
+                <span class="len tabular">4:06</span>
                 <h3>La Simulación</h3>
                 <p>Relato en pixel art, cuadro a cuadro, sobre una realidad que no termina de encajar.</p>
             </article>
             <article class="show">
-                <span class="ico" aria-hidden="true">🚗</span>
+                <span class="len tabular">1:27</span>
                 <h3>Carros Stop Motion</h3>
                 <p>Animación hecha con objetos reales y mucha paciencia: miles de fotos para un minuto y medio de viaje.</p>
             </article>
@@ -368,7 +370,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="about">
             <div>
                 <p>Cine Laptop TV reúne esas producciones en una señal continua. No hay que elegir qué ver: el canal ya está al aire y cambia solo, con cortes publicitarios entre programa y programa, igual que la televisión de siempre.</p>
-                <p>La emisión se calcula con el reloj de tu dispositivo y cada video entra en el minuto y segundo que le toca, así que si llegas a mitad de un programa lo verás justo por donde va. A medianoche entra el Himno Nacional Mexicano y arranca de nuevo el ciclo del día.</p>
+                <p>La emisión se calcula con el reloj de tu dispositivo y cada video entra en el segundo que le toca, así que si llegas a mitad de un programa lo verás justo por donde va. A medianoche entra el Himno Nacional Mexicano y arranca de nuevo el ciclo del día.</p>
             </div>
 
             <ul class="facts">
@@ -376,7 +378,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
                 <li><span>Apertura</span> <b>00:00 · Himno Nacional</b></li>
                 <li><span>Corte publicitario</span> <b>2:42</b></li>
                 <li><span>Producciones en rotación</span> <b id="factTitulos">—</b></li>
-                <li><span>Emisiones por día</span> <b id="factBloques">—</b></li>
+                <li><span>Emisiones de hoy</span> <b id="factBloques">—</b></li>
             </ul>
         </div>
     </div>
@@ -398,106 +400,156 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
    CINE LAPTOP TV — señal continua de 24 horas
 
    Cada programa ocupa su duración real (en segundos) y entre
-   uno y otro entra el corte publicitario. Si quieres cambiar
-   una duración, edita solo el campo "dur" de ese programa.
+   uno y otro entra el corte publicitario. Para cambiar algo,
+   edita el campo "dur" del programa correspondiente.
 ========================================================= */
 
 const DIA = 86400;
 
-/* Duración de la publicidad: 2:42 */
+/* ---------------------------------------------------------
+   AJUSTES SOLO POR HOY  (15 de septiembre de 2026)
+   Al cambiar de día se aplican solos los valores normales.
+--------------------------------------------------------- */
+const FECHA_ESPECIAL = "2026-09-15";
+
+const MARGEN_HOY = 30;              /* 30 s extra a cada programa, sin contar publicidad */
+
+const ESPECIAL_NOCHE = {            /* 22:00 – 00:00 */
+    titulo:"Especial de esta noche",
+    descripcion:"Transmisión especial de Cine Laptop TV, de 22:00 a medianoche.",
+    categoria:"Especial",
+    url:"https://www.youtube.com/embed/p2AzyIEuFak",
+    inicio: 22*3600,
+    fin: DIA
+};
+
+/* ---------------------------------------------------------
+   CONTENIDOS
+--------------------------------------------------------- */
+
 const PUBLICIDAD = {
     titulo:"Publicidad",
     descripcion:"Corte publicitario de Cine Laptop TV.",
     categoria:"Publicidad",
-    icono:"📢",
     url:"https://www.youtube.com/embed/8V-Vq2g8Ju4",
     dur: 2*60 + 42,
     anuncio:true
 };
 
-/* 00:00 — Himno Nacional, 10 minutos */
 const HIMNO = {
     titulo:"Himno Nacional Mexicano",
     descripcion:"Apertura de la emisión. El canal abre el día con el Himno Nacional.",
     categoria:"Especial",
-    icono:"🇲🇽",
     url:"https://www.youtube.com/embed/DOAFBiPFOWE",
     dur: 10*60
 };
 
 const CATALOGO = [
-    { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental", icono:"🥖",
+    { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental",
       url:"https://www.youtube.com/embed/5X8gx_yEFLg", dur: 7*60 + 12 },
 
-    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental", icono:"🎞️",
+    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental",
       url:"https://www.youtube.com/embed/DZT6qLmZT_0", dur: 6*60 + 41 },
 
-    { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine", icono:"🎬",
+    { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine",
       url:"https://www.youtube.com/embed/MyY0r5QoIwY", dur: 3*60 + 55 },
 
-    { titulo:"Pancracio 2", descripcion:"Continuación de la serie Pancracio.", categoria:"Cine", icono:"🎬",
+    { titulo:"Pancracio 2", descripcion:"Continuación de la serie Pancracio.", categoria:"Cine",
       url:"https://www.youtube.com/embed/JkZ51R-z30o", dur: 7*60 + 7 },
 
-    /* ⚠️ Duración provisional: no me diste la de este corto. Cambia el 60 por los segundos reales. */
-    { titulo:"Lavar los platos", descripcion:"Cortometraje de Cine Laptop.", categoria:"Cine", icono:"🍽️",
+    /* Duración provisional: cambia el 60 por los segundos reales. */
+    { titulo:"Lavar los platos", descripcion:"Cortometraje de Cine Laptop.", categoria:"Cine",
       url:"https://www.youtube.com/embed/XG2CLA7uuzs", dur: 60 },
 
-    { titulo:"Carros Stop Motion", descripcion:"Animación cuadro por cuadro con autos de juguete.", categoria:"Cine", icono:"🚗",
+    { titulo:"Carros Stop Motion", descripcion:"Animación cuadro por cuadro con autos de juguete.", categoria:"Cine",
       url:"https://www.youtube.com/embed/dxqasHpvR-c", dur: 1*60 + 27 },
 
-    { titulo:"La Simulación", descripcion:"Relato en pixel art sobre una realidad que falla.", categoria:"Cine", icono:"🕹️",
+    { titulo:"La Simulación", descripcion:"Relato en pixel art sobre una realidad que falla.", categoria:"Cine",
       url:"https://www.youtube.com/embed/pokEncxip4I", dur: 4*60 + 6 },
 
-    { titulo:"Tender la cama", descripcion:"Stop motion doméstico de Cine Laptop.", categoria:"Cine", icono:"🛏️",
+    { titulo:"Tender la cama", descripcion:"Stop motion doméstico de Cine Laptop.", categoria:"Cine",
       url:"https://www.youtube.com/embed/sjFXZRWHuQY", dur: 50 },
 
-    { titulo:"Nocturne", descripcion:"Pieza nocturna de Cine Laptop.", categoria:"Cine", icono:"🌙",
+    { titulo:"Nocturne", descripcion:"Pieza nocturna de Cine Laptop.", categoria:"Cine",
       url:"https://www.youtube.com/embed/hYmyKxIMozY", dur: 52 },
 
-    { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine", icono:"🍲",
+    { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine",
       url:"https://www.youtube.com/embed/z8UWk_M1bJA", dur: 12 }
 ];
 
 /* ---------- armado de la parrilla ---------- */
 
-const parrilla = [];
-let cursor = 0;
+const fechaDeHoy = () => {
+    const d = new Date();
+    return d.getFullYear() + "-" + dosDig(d.getMonth() + 1) + "-" + dosDig(d.getDate());
+};
 
-function agendar(base){
-    if (cursor >= DIA) return;
-    parrilla.push({
-        titulo: base.titulo,
-        descripcion: base.descripcion,
-        categoria: base.categoria,
-        icono: base.icono,
-        url: base.url,
-        anuncio: !!base.anuncio,
-        dur: base.dur,
-        inicio: cursor,
-        fin: Math.min(cursor + base.dur, DIA)
-    });
-    cursor = Math.min(cursor + base.dur, DIA);
+let parrilla = [];
+let diaMontado = "";
+
+function construirParrilla(){
+    const esEspecial = fechaDeHoy() === FECHA_ESPECIAL;
+    const margen = esEspecial ? MARGEN_HOY : 0;
+    const limite = esEspecial ? ESPECIAL_NOCHE.inicio : DIA;
+
+    parrilla = [];
+    let cursor = 0;
+
+    const agendar = (base, extra) => {
+        if (cursor >= limite) return;
+        const dur = base.dur + (base.anuncio ? 0 : extra);
+        parrilla.push({
+            titulo: base.titulo,
+            descripcion: base.descripcion,
+            categoria: base.categoria,
+            url: base.url,
+            anuncio: !!base.anuncio,
+            dur,
+            inicio: cursor,
+            fin: Math.min(cursor + dur, limite)
+        });
+        cursor = Math.min(cursor + dur, limite);
+    };
+
+    agendar(HIMNO, margen);
+    agendar(PUBLICIDAD, margen);
+
+    let vuelta = 0;
+    while (cursor < limite){
+        agendar(CATALOGO[vuelta % CATALOGO.length], margen);
+        if (cursor < limite) agendar(PUBLICIDAD, margen);
+        vuelta++;
+    }
+
+    if (esEspecial){
+        parrilla.push({
+            titulo: ESPECIAL_NOCHE.titulo,
+            descripcion: ESPECIAL_NOCHE.descripcion,
+            categoria: ESPECIAL_NOCHE.categoria,
+            url: ESPECIAL_NOCHE.url,
+            anuncio:false,
+            dur: ESPECIAL_NOCHE.fin - ESPECIAL_NOCHE.inicio,
+            inicio: ESPECIAL_NOCHE.inicio,
+            fin: ESPECIAL_NOCHE.fin
+        });
+    }
+
+    diaMontado = fechaDeHoy();
+
+    $("factTitulos").textContent = (CATALOGO.length + 1) + " títulos";
+    $("factBloques").textContent = parrilla.filter(p => !p.anuncio).length + " emisiones";
+    $("notaDia").textContent = esEspecial
+        ? "Hoy cada programa lleva 30 segundos extra y de 22:00 a medianoche va el especial. El resto de los días vuelve el horario normal."
+        : "Cada programa ocupa exactamente su duración real, con un corte de 2:42 entre uno y otro.";
 }
-
-agendar(HIMNO);
-agendar(PUBLICIDAD);
-
-let vuelta = 0;
-while (cursor < DIA){
-    agendar(CATALOGO[vuelta % CATALOGO.length]);
-    if (cursor < DIA) agendar(PUBLICIDAD);
-    vuelta++;
-}
-
-document.getElementById("factTitulos").textContent = (CATALOGO.length + 1) + " títulos";
-document.getElementById("factBloques").textContent = parrilla.filter(p => !p.anuncio).length + " emisiones";
 
 /* ---------- tiempo ---------- */
 
-const dosDig = n => String(n).padStart(2,"0");
+function dosDig(n){ return String(n).padStart(2,"0"); }
+
 const reloj = s => dosDig(Math.floor(s/3600)%24) + ":" + dosDig(Math.floor(s/60)%60) + ":" + dosDig(s%60);
-const corto = s => dosDig(Math.floor(s/3600)%24) + ":" + dosDig(Math.floor(s/60)%60);
-const largo = s => Math.floor(s/60) + ":" + dosDig(s%60);
+const largo = s => (s >= 3600 ? Math.floor(s/3600) + ":" + dosDig(Math.floor(s/60)%60) + ":" + dosDig(s%60)
+                              : Math.floor(s/60) + ":" + dosDig(s%60));
 
 const ahora = () => {
     const d = new Date();
@@ -512,6 +564,8 @@ const indiceActual = () => {
 
 /* ---------- reproductor ---------- */
 
+const $ = id => document.getElementById(id);
+
 const idDe = url => (url.match(/embed\/([\w-]+)/) || [,""])[1];
 
 function fuente(url, conSonido, desde){
@@ -521,10 +575,12 @@ function fuente(url, conSonido, desde){
         "&rel=0&modestbranding=1&playsinline=1&start=" + Math.max(0, Math.floor(desde || 0));
 }
 
-const screen = document.getElementById("screen");
+const screen = $("screen");
 let conSonido = false;
 let enPantalla = null;
 let desdePantalla = 0;
+let modoManual = false;
+let indiceEnAire = -1;
 
 function reproducir(programa, desde){
     enPantalla = programa;
@@ -539,26 +595,40 @@ function reproducir(programa, desde){
     screen.appendChild(f);
 }
 
-document.getElementById("sound").addEventListener("click", e => {
+$("sound").addEventListener("click", e => {
     conSonido = !conSonido;
     e.currentTarget.textContent = conSonido ? "Silenciar" : "Activar sonido";
-    if (enPantalla){
-        /* al reactivar el sonido, se reengancha con el punto exacto de la emisión */
-        const i = indiceActual();
-        const p = parrilla[i];
-        if (!modoManual && p === parrilla[indiceEnAire]) reproducir(p, ahora() - p.inicio);
-        else reproducir(enPantalla, desdePantalla);
-    }
+    if (!enPantalla) return;
+    if (modoManual) reproducir(enPantalla, desdePantalla);
+    else { const p = parrilla[indiceActual()]; reproducir(p, ahora() - p.inicio); }
+});
+
+/* pantalla completa */
+
+const stage = $("stage");
+const full = $("full");
+
+full.addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (stage.requestFullscreen) stage.requestFullscreen();
+    else if (stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
+    else aviso("Tu navegador no permite pantalla completa aquí. Usa el botón del reproductor.");
+});
+
+document.addEventListener("fullscreenchange", () => {
+    full.textContent = document.fullscreenElement ? "Salir de pantalla completa" : "Pantalla completa";
 });
 
 /* ---------- señal en vivo ---------- */
 
-let indiceEnAire = -1;
-let modoManual = false;
-
-const $ = id => document.getElementById(id);
-
 function actualizarSenal(){
+    if (fechaDeHoy() !== diaMontado){
+        construirParrilla();
+        indiceEnAire = -1;
+        modoManual = false;
+        pintarParrilla();
+    }
+
     const i = indiceActual();
     const p = parrilla[i];
 
@@ -579,7 +649,7 @@ function actualizarSenal(){
     $("progress").style.width = Math.min(100, Math.max(0, avance*100)) + "%";
 
     const restante = Math.max(0, p.fin - s);
-    $("countdown").textContent = dosDig(Math.floor(restante/60)) + ":" + dosDig(restante%60);
+    $("countdown").textContent = largo(restante);
 
     const cola = [];
     for (let k = 1; k <= 4; k++) cola.push(parrilla[(i + k) % parrilla.length]);
@@ -588,7 +658,7 @@ function actualizarSenal(){
         <li>
             <time>${reloj(x.inicio)}</time>
             <div>
-                <b>${x.icono} ${x.titulo}</b>
+                <b>${x.titulo}</b>
                 <span>${largo(x.dur)} · ${x.descripcion}</span>
             </div>
         </li>
@@ -639,7 +709,6 @@ function pintarParrilla(){
         <button class="slot ${estado} ${p.anuncio ? "is-ad" : ""}" data-i="${p.i}" type="button">
             <time>${reloj(p.inicio)}</time>
             <span class="dur">${largo(p.dur)}</span>
-            <span class="ico" aria-hidden="true">${p.icono}</span>
             <span>
                 <h4>${p.titulo}</h4>
                 <p>${p.descripcion}</p>
@@ -670,18 +739,12 @@ grid.addEventListener("click", e => {
         : "Fuera de emisión · " + largo(p.dur) + " · " + p.categoria;
 
     aviso(enAire ? "De vuelta a la señal en vivo" : "Reproduciendo: " + p.titulo);
-    document.getElementById("emision").scrollIntoView({ block:"start" });
+    $("emision").scrollIntoView({ block:"start" });
 });
 
-more.addEventListener("click", () => {
-    visibles += PASO;
-    pintarParrilla();
-});
+more.addEventListener("click", () => { visibles += PASO; pintarParrilla(); });
 
-$("search").addEventListener("input", () => {
-    visibles = PASO;
-    pintarParrilla();
-});
+$("search").addEventListener("input", () => { visibles = PASO; pintarParrilla(); });
 
 document.querySelectorAll(".chip[data-cat]").forEach(chip => {
     chip.addEventListener("click", () => {
@@ -705,7 +768,7 @@ $("goNow").addEventListener("click", () => {
         c.setAttribute("aria-pressed", c.dataset.cat === "Todos" ? "true" : "false"));
     actualizarSenal();
     pintarParrilla();
-    document.getElementById("parrilla").scrollIntoView({ block:"start" });
+    $("parrilla").scrollIntoView({ block:"start" });
 });
 
 /* ---------- avisos ---------- */
@@ -721,6 +784,7 @@ function aviso(texto){
 
 /* ---------- arranque ---------- */
 
+construirParrilla();
 actualizarSenal();
 pintarParrilla();
 setInterval(actualizarSenal, 1000);
