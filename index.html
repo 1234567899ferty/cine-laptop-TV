@@ -308,7 +308,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="section-head">
             <div>
                 <h2>Parrilla del día</h2>
-                <p id="notaDia">Cada programa ocupa su duración real más un margen de 30 segundos, con un corte de 2:42 entre uno y otro.</p>
+                <p id="notaDia">Cada programa ocupa su duración real. Cada dos programas entra un corte publicitario, elegido al azar entre los anuncios disponibles.</p>
             </div>
             <button class="chip" id="goNow" type="button">Ir a lo que se emite ahora</button>
         </div>
@@ -376,7 +376,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
             <ul class="facts">
                 <li><span>Al aire</span> <b>24 horas</b></li>
                 <li><span>Apertura</span> <b>00:00 · Himno Nacional</b></li>
-                <li><span>Corte publicitario</span> <b>2:42</b></li>
+                <li><span>Corte publicitario</span> <b>cada 2 programas</b></li>
                 <li><span>Producciones en rotación</span> <b id="factTitulos">—</b></li>
                 <li><span>Emisiones de hoy</span> <b id="factBloques">—</b></li>
             </ul>
@@ -407,34 +407,53 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 const DIA = 86400;
 
 /* ---------------------------------------------------------
-   AJUSTES SOLO POR HOY  (15 de septiembre de 2026)
-   Al cambiar de día se aplican solos los valores normales.
+   TRANSMISIONES ESPECIALES
+   Cada una vive solo en su fecha ("fecha": AAAA-MM-DD). Al
+   cambiar de día, la parrilla vuelve sola al horario normal.
+   Para agregar otra, copia un objeto y cambia sus datos.
 --------------------------------------------------------- */
-const FECHA_ESPECIAL = "2026-09-15";
+const ESPECIALES = [
+    {
+        fecha:"2026-09-16",
+        inicio: 10*3600,
+        fin: 14*3600,                          /* 10:00 – 14:00 */
+        titulo:"Desfile Militar",
+        descripcion:"Transmisión especial del Desfile Militar, de 10:00 a 14:00.",
+        categoria:"Especial",
+        url:"https://www.youtube.com/embed/p2AzyIEuFak"
+    }
+];
 
-const MARGEN_HOY = 30;              /* 30 s extra a cada programa, sin contar publicidad */
-
-const ESPECIAL_NOCHE = {            /* 22:00 – 00:00 */
-    titulo:"Especial de esta noche",
-    descripcion:"Transmisión especial de Cine Laptop TV, de 22:00 a medianoche.",
-    categoria:"Especial",
-    url:"https://www.youtube.com/embed/p2AzyIEuFak",
-    inicio: 22*3600,
-    fin: DIA
+/* Margen extra por programa (en segundos), solo para fechas listadas aquí */
+const MARGENES = {
+    "2026-09-15": 10
 };
 
 /* ---------------------------------------------------------
    CONTENIDOS
 --------------------------------------------------------- */
 
-const PUBLICIDAD = {
-    titulo:"Publicidad",
-    descripcion:"Corte publicitario de Cine Laptop TV.",
-    categoria:"Publicidad",
-    url:"https://www.youtube.com/embed/8V-Vq2g8Ju4",
-    dur: 2*60 + 42,
-    anuncio:true
-};
+const ANUNCIOS = [
+    {
+        titulo:"Publicidad",
+        descripcion:"Corte publicitario de Cine Laptop TV.",
+        categoria:"Publicidad",
+        url:"https://www.youtube.com/embed/8V-Vq2g8Ju4",
+        dur: 2*60 + 42,
+        anuncio:true
+    },
+    {
+        titulo:"Publicidad",
+        descripcion:"Corte publicitario de Cine Laptop TV.",
+        categoria:"Publicidad",
+        url:"https://www.youtube.com/embed/Rkv9x5leGTM",
+        /* Duración provisional: no me diste la de este anuncio, cambia estos segundos por los reales. */
+        dur: 2*60 + 42,
+        anuncio:true
+    }
+];
+
+const elegirAnuncio = () => ANUNCIOS[Math.floor(Math.random() * ANUNCIOS.length)];
 
 const HIMNO = {
     titulo:"Himno Nacional Mexicano",
@@ -474,7 +493,10 @@ const CATALOGO = [
       url:"https://www.youtube.com/embed/hYmyKxIMozY", dur: 52 },
 
     { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine",
-      url:"https://www.youtube.com/embed/z8UWk_M1bJA", dur: 12 }
+      url:"https://www.youtube.com/embed/z8UWk_M1bJA", dur: 12 },
+
+    { titulo:"Carnaval de Tlaxcala", descripcion:"Documental de Cine Laptop sobre el Carnaval de Tlaxcala.", categoria:"Documental",
+      url:"https://www.youtube.com/embed/ItAyKz9irlE", dur: 24*60 + 1 }
 ];
 
 /* ---------- armado de la parrilla ---------- */
@@ -488,16 +510,21 @@ let parrilla = [];
 let diaMontado = "";
 
 function construirParrilla(){
-    const esEspecial = fechaDeHoy() === FECHA_ESPECIAL;
-    const margen = esEspecial ? MARGEN_HOY : 0;
-    const limite = esEspecial ? ESPECIAL_NOCHE.inicio : DIA;
+    const fechaHoy = fechaDeHoy();
+    const margen = MARGENES[fechaHoy] || 0;
+    const especialesHoy = ESPECIALES
+        .filter(e => e.fecha === fechaHoy)
+        .sort((a, b) => a.inicio - b.inicio);
 
     parrilla = [];
     let cursor = 0;
+    let vuelta = 0;
+    let contador = 0;              /* cuenta programas (no anuncios) para el patrón 2+1 */
 
-    const agendar = (base, extra) => {
+    /* agenda un programa o corte, recortándolo si choca con un límite (medianoche o un especial) */
+    const agendarHasta = (base, durDeseada, limite) => {
         if (cursor >= limite) return;
-        const dur = base.dur + (base.anuncio ? 0 : extra);
+        const dur = Math.min(durDeseada, limite - cursor);
         parrilla.push({
             titulo: base.titulo,
             descripcion: base.descripcion,
@@ -506,41 +533,68 @@ function construirParrilla(){
             anuncio: !!base.anuncio,
             dur,
             inicio: cursor,
-            fin: Math.min(cursor + dur, limite)
+            fin: cursor + dur
         });
-        cursor = Math.min(cursor + dur, limite);
+        cursor += dur;
     };
 
-    agendar(HIMNO, margen);
-    agendar(PUBLICIDAD, margen);
+    /* llena con la rotación normal desde "cursor" hasta "limite":
+       programa, programa, anuncio (al azar), programa, programa, anuncio... */
+    const llenarHasta = limite => {
+        while (cursor < limite){
+            const base = CATALOGO[vuelta % CATALOGO.length];
+            agendarHasta(base, base.dur + margen, limite);
+            vuelta++;
+            contador++;
 
-    let vuelta = 0;
-    while (cursor < limite){
-        agendar(CATALOGO[vuelta % CATALOGO.length], margen);
-        if (cursor < limite) agendar(PUBLICIDAD, margen);
-        vuelta++;
-    }
+            if (contador % 2 === 0 && cursor < limite){
+                const anuncio = elegirAnuncio();
+                agendarHasta(anuncio, anuncio.dur, limite);
+            }
+        }
+    };
 
-    if (esEspecial){
+    /* la emisión siempre abre con el Himno, que cuenta como el primer programa del patrón */
+    const primerLimite = especialesHoy.length ? especialesHoy[0].inicio : DIA;
+    agendarHasta(HIMNO, HIMNO.dur + margen, primerLimite);
+    contador++;
+
+    llenarHasta(primerLimite);
+
+    especialesHoy.forEach(especial => {
+        llenarHasta(especial.inicio);
+
         parrilla.push({
-            titulo: ESPECIAL_NOCHE.titulo,
-            descripcion: ESPECIAL_NOCHE.descripcion,
-            categoria: ESPECIAL_NOCHE.categoria,
-            url: ESPECIAL_NOCHE.url,
+            titulo: especial.titulo,
+            descripcion: especial.descripcion,
+            categoria: especial.categoria || "Especial",
+            url: especial.url,
             anuncio:false,
-            dur: ESPECIAL_NOCHE.fin - ESPECIAL_NOCHE.inicio,
-            inicio: ESPECIAL_NOCHE.inicio,
-            fin: ESPECIAL_NOCHE.fin
+            dur: especial.fin - especial.inicio,
+            inicio: especial.inicio,
+            fin: especial.fin
         });
-    }
+        cursor = especial.fin;
+        contador = 0;           /* el patrón vuelve a empezar tras la transmisión especial */
+    });
 
-    diaMontado = fechaDeHoy();
+    llenarHasta(DIA);
+
+    diaMontado = fechaHoy;
 
     $("factTitulos").textContent = (CATALOGO.length + 1) + " títulos";
     $("factBloques").textContent = parrilla.filter(p => !p.anuncio).length + " emisiones";
-    $("notaDia").textContent = esEspecial
-        ? "Hoy cada programa lleva 30 segundos extra y de 22:00 a medianoche va el especial. El resto de los días vuelve el horario normal."
-        : "Cada programa ocupa exactamente su duración real, con un corte de 2:42 entre uno y otro.";
+
+    if (especialesHoy.length){
+        const detalle = especialesHoy
+            .map(e => reloj(e.inicio).slice(0,5) + "–" + reloj(e.fin).slice(0,5) + " " + e.titulo)
+            .join(" · ");
+        $("notaDia").textContent = "Hoy la parrilla incluye: " + detalle +
+            (margen ? (" El resto de los programas lleva " + margen + " segundos extra.") : "") +
+            " El resto de los días vuelve el horario normal.";
+    } else {
+        $("notaDia").textContent = "Cada programa ocupa su duración real. Cada dos programas entra un corte publicitario, elegido al azar entre los anuncios disponibles.";
+    }
 }
 
 /* ---------- tiempo ---------- */
