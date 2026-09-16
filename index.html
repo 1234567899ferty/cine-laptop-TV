@@ -97,10 +97,41 @@ a{color:inherit}
 .stage:fullscreen .now{display:none}
 
 .screen{position:relative;aspect-ratio:16/9;background:#000}
-.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-host{position:absolute;inset:0}
+.video-host iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
 .screen-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--ink-faint);gap:10px}
 .screen-empty img{width:54px;height:54px;margin:0 auto;opacity:.8}
+
+/* ---------- pausa publicitaria / regresamos ---------- */
+/* paleta: FFEDB9 · FFCB56 · FFA259 · FF7E7E */
+
+.bumper{
+    position:absolute;inset:0;z-index:6;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:10px;padding:20px;
+    background:linear-gradient(135deg,#FFEDB9,#FFCB56 55%,#FFA259);
+    color:#4a2410;
+}
+.bumper.regresamos{
+    background:linear-gradient(135deg,#FFA259,#FF7E7E);
+    color:#3a0d10;
+}
+.bumper h3{font-family:"Barlow Condensed",sans-serif;font-size:clamp(26px,5vw,42px);letter-spacing:.05em;text-transform:uppercase}
+.bumper p{font-size:14px;opacity:.85}
+.bumper.oculto{display:none}
+
+/* ---------- sello de clasificación por edad ---------- */
+
+.rating{
+    position:absolute;top:14px;left:14px;z-index:5;
+    font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;
+    padding:6px 13px;border-radius:8px;
+    background:#FFCB56;color:#3a2410;
+    box-shadow:0 4px 14px rgba(0,0,0,.4);
+}
+.rating.b15{background:#FF7E7E;color:#3a0d10}
+.rating.oculto{display:none}
 
 .bar{height:3px;background:var(--line-soft)}
 .bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--carmin),var(--ambar));transition:width 1s linear}
@@ -269,10 +300,19 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
             <div class="stage" id="stage">
                 <div class="screen" id="screen">
-                    <div class="screen-empty">
-                        <img src="https://www.gstatic.com/android/keyboard/emojikitchen/20240530/u1f4bb/u1f4bb_u1f3ac.png" alt="">
-                        <p>Sintonizando la señal…</p>
+                    <div class="video-host" id="videoHost">
+                        <div class="screen-empty">
+                            <img src="https://www.gstatic.com/android/keyboard/emojikitchen/20240530/u1f4bb/u1f4bb_u1f3ac.png" alt="">
+                            <p>Sintonizando la señal…</p>
+                        </div>
                     </div>
+
+                    <div class="bumper oculto" id="bumper">
+                        <h3 id="bumperTitulo">PAUSA PUBLICITARIA</h3>
+                        <p id="bumperTexto">Volvemos en un momento</p>
+                    </div>
+
+                    <div class="rating oculto" id="rating">AA</div>
                 </div>
 
                 <div class="bar"><span id="progress"></span></div>
@@ -406,23 +446,20 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
 const DIA = 86400;
 
+/* Duración de las pantallas "Pausa publicitaria" y "Regresamos", en segundos,
+   al inicio y al final de cada corte publicitario. */
+const DUR_BUMPER = 4;
+
+/* Cuántos segundos se muestra el sello de clasificación al empezar cada programa */
+const DUR_CLASIFICACION = 8;
+
 /* ---------------------------------------------------------
    TRANSMISIONES ESPECIALES
    Cada una vive solo en su fecha ("fecha": AAAA-MM-DD). Al
    cambiar de día, la parrilla vuelve sola al horario normal.
    Para agregar otra, copia un objeto y cambia sus datos.
 --------------------------------------------------------- */
-const ESPECIALES = [
-    {
-        fecha:"2026-09-16",
-        inicio: 10*3600,
-        fin: 14*3600,                          /* 10:00 – 14:00 */
-        titulo:"Desfile Militar",
-        descripcion:"Transmisión especial del Desfile Militar, de 10:00 a 14:00.",
-        categoria:"Especial",
-        url:"https://www.youtube.com/embed/p2AzyIEuFak"
-    }
-];
+const ESPECIALES = [];
 
 /* Margen extra por programa (en segundos), solo para fechas listadas aquí */
 const MARGENES = {
@@ -447,8 +484,7 @@ const ANUNCIOS = [
         descripcion:"Corte publicitario de Cine Laptop TV.",
         categoria:"Publicidad",
         url:"https://www.youtube.com/embed/Rkv9x5leGTM",
-        /* Duración provisional: no me diste la de este anuncio, cambia estos segundos por los reales. */
-        dur: 2*60 + 42,
+        dur: 60 + 10,
         anuncio:true
     }
 ];
@@ -459,43 +495,44 @@ const HIMNO = {
     titulo:"Himno Nacional Mexicano",
     descripcion:"Apertura de la emisión. El canal abre el día con el Himno Nacional.",
     categoria:"Especial",
+    clasificacion:"AA",
     url:"https://www.youtube.com/embed/DOAFBiPFOWE",
     dur: 10*60
 };
 
 const CATALOGO = [
-    { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental",
+    { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental", clasificacion:"AA",
       url:"https://www.youtube.com/embed/5X8gx_yEFLg", dur: 7*60 + 12 },
 
-    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental",
+    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental", clasificacion:"AA",
       url:"https://www.youtube.com/embed/DZT6qLmZT_0", dur: 6*60 + 41 },
 
-    { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine",
+    { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine", clasificacion:"B15",
       url:"https://www.youtube.com/embed/MyY0r5QoIwY", dur: 3*60 + 55 },
 
-    { titulo:"Pancracio 2", descripcion:"Continuación de la serie Pancracio.", categoria:"Cine",
+    { titulo:"Pancracio 2", descripcion:"Continuación de la serie Pancracio.", categoria:"Cine", clasificacion:"B15",
       url:"https://www.youtube.com/embed/JkZ51R-z30o", dur: 7*60 + 7 },
 
     /* Duración provisional: cambia el 60 por los segundos reales. */
-    { titulo:"Lavar los platos", descripcion:"Cortometraje de Cine Laptop.", categoria:"Cine",
+    { titulo:"Lavar los platos", descripcion:"Cortometraje de Cine Laptop.", categoria:"Cine", clasificacion:"AA",
       url:"https://www.youtube.com/embed/XG2CLA7uuzs", dur: 60 },
 
-    { titulo:"Carros Stop Motion", descripcion:"Animación cuadro por cuadro con autos de juguete.", categoria:"Cine",
+    { titulo:"Carros Stop Motion", descripcion:"Animación cuadro por cuadro con autos de juguete.", categoria:"Cine", clasificacion:"AA",
       url:"https://www.youtube.com/embed/dxqasHpvR-c", dur: 1*60 + 27 },
 
-    { titulo:"La Simulación", descripcion:"Relato en pixel art sobre una realidad que falla.", categoria:"Cine",
+    { titulo:"La Simulación", descripcion:"Relato en pixel art sobre una realidad que falla.", categoria:"Cine", clasificacion:"AA",
       url:"https://www.youtube.com/embed/pokEncxip4I", dur: 4*60 + 6 },
 
-    { titulo:"Tender la cama", descripcion:"Stop motion doméstico de Cine Laptop.", categoria:"Cine",
+    { titulo:"Tender la cama", descripcion:"Stop motion doméstico de Cine Laptop.", categoria:"Cine", clasificacion:"AA",
       url:"https://www.youtube.com/embed/sjFXZRWHuQY", dur: 50 },
 
-    { titulo:"Nocturne", descripcion:"Pieza nocturna de Cine Laptop.", categoria:"Cine",
+    { titulo:"Nocturne", descripcion:"Pieza nocturna de Cine Laptop.", categoria:"Cine", clasificacion:"AA",
       url:"https://www.youtube.com/embed/hYmyKxIMozY", dur: 52 },
 
-    { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine",
+    { titulo:"Comiendo", descripcion:"Corto sobre la mesa y sus rituales.", categoria:"Cine", clasificacion:"AA",
       url:"https://www.youtube.com/embed/z8UWk_M1bJA", dur: 12 },
 
-    { titulo:"Carnaval de Tlaxcala", descripcion:"Documental de Cine Laptop sobre el Carnaval de Tlaxcala.", categoria:"Documental",
+    { titulo:"Carnaval de Tlaxcala", descripcion:"Documental de Cine Laptop sobre el Carnaval de Tlaxcala.", categoria:"Documental", clasificacion:"AA",
       url:"https://www.youtube.com/embed/ItAyKz9irlE", dur: 24*60 + 1 }
 ];
 
@@ -522,15 +559,17 @@ function construirParrilla(){
     let contador = 0;              /* cuenta programas (no anuncios) para el patrón 2+1 */
 
     /* agenda un programa o corte, recortándolo si choca con un límite (medianoche o un especial) */
-    const agendarHasta = (base, durDeseada, limite) => {
+    const agendarHasta = (base, durDeseada, limite, bumper) => {
         if (cursor >= limite) return;
         const dur = Math.min(durDeseada, limite - cursor);
         parrilla.push({
             titulo: base.titulo,
             descripcion: base.descripcion,
             categoria: base.categoria,
+            clasificacion: base.clasificacion || null,
             url: base.url,
             anuncio: !!base.anuncio,
+            bumper: base.anuncio ? (bumper || 0) : 0,
             dur,
             inicio: cursor,
             fin: cursor + dur
@@ -539,7 +578,9 @@ function construirParrilla(){
     };
 
     /* llena con la rotación normal desde "cursor" hasta "limite":
-       programa, programa, anuncio (al azar), programa, programa, anuncio... */
+       programa, programa, anuncio (al azar), programa, programa, anuncio...
+       cada anuncio lleva su pantalla de "pausa publicitaria" al inicio
+       y "regresamos" al final, sin recortar el anuncio en sí */
     const llenarHasta = limite => {
         while (cursor < limite){
             const base = CATALOGO[vuelta % CATALOGO.length];
@@ -549,7 +590,7 @@ function construirParrilla(){
 
             if (contador % 2 === 0 && cursor < limite){
                 const anuncio = elegirAnuncio();
-                agendarHasta(anuncio, anuncio.dur, limite);
+                agendarHasta(anuncio, anuncio.dur + 2 * DUR_BUMPER, limite, DUR_BUMPER);
             }
         }
     };
@@ -568,8 +609,10 @@ function construirParrilla(){
             titulo: especial.titulo,
             descripcion: especial.descripcion,
             categoria: especial.categoria || "Especial",
+            clasificacion: especial.clasificacion || "AA",
             url: especial.url,
             anuncio:false,
+            bumper:0,
             dur: especial.fin - especial.inicio,
             inicio: especial.inicio,
             fin: especial.fin
@@ -629,32 +672,69 @@ function fuente(url, conSonido, desde){
         "&rel=0&modestbranding=1&playsinline=1&start=" + Math.max(0, Math.floor(desde || 0));
 }
 
-const screen = $("screen");
+const videoHost = $("videoHost");
+const bumper = $("bumper");
+const bumperTitulo = $("bumperTitulo");
+const bumperTexto = $("bumperTexto");
+const rating = $("rating");
+
 let conSonido = false;
 let enPantalla = null;
 let desdePantalla = 0;
 let modoManual = false;
 let indiceEnAire = -1;
+let estadoActual = null;
 
 function reproducir(programa, desde){
     enPantalla = programa;
     desdePantalla = desde || 0;
-    screen.innerHTML = "";
+    videoHost.innerHTML = "";
     const f = document.createElement("iframe");
     f.src = fuente(programa.url, conSonido, desdePantalla);
     f.title = programa.titulo;
     f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     f.referrerPolicy = "strict-origin-when-cross-origin";
     f.allowFullscreen = true;
-    screen.appendChild(f);
+    videoHost.appendChild(f);
+}
+
+function mostrarBumper(tipo){
+    bumper.classList.remove("oculto");
+    if (tipo === "regresamos"){
+        bumper.classList.add("regresamos");
+        bumperTitulo.textContent = "REGRESAMOS";
+        bumperTexto.textContent = "La programación continúa en un momento.";
+    } else {
+        bumper.classList.remove("regresamos");
+        bumperTitulo.textContent = "PAUSA PUBLICITARIA";
+        bumperTexto.textContent = "Volvemos en un momento.";
+    }
+}
+
+function ocultarBumper(){
+    bumper.classList.add("oculto");
+}
+
+function actualizarSello(clasificacion, mostrar){
+    if (!mostrar || !clasificacion){
+        rating.classList.add("oculto");
+        return;
+    }
+    rating.textContent = clasificacion;
+    rating.classList.toggle("b15", clasificacion === "B15");
+    rating.classList.remove("oculto");
 }
 
 $("sound").addEventListener("click", e => {
     conSonido = !conSonido;
     e.currentTarget.textContent = conSonido ? "Silenciar" : "Activar sonido";
-    if (!enPantalla) return;
-    if (modoManual) reproducir(enPantalla, desdePantalla);
-    else { const p = parrilla[indiceActual()]; reproducir(p, ahora() - p.inicio); }
+    if (modoManual){
+        if (enPantalla) reproducir(enPantalla, desdePantalla);
+        return;
+    }
+    if (estadoActual === "pausa" || estadoActual === "regresamos") return;
+    const p = parrilla[indiceActual()];
+    reproducir(p, ahora() - p.inicio - (p.bumper || 0));
 });
 
 /* pantalla completa */
@@ -675,20 +755,47 @@ document.addEventListener("fullscreenchange", () => {
 
 /* ---------- señal en vivo ---------- */
 
+function estadoDe(p, s){
+    if (p.anuncio){
+        const t = s - p.inicio;
+        const restante = p.fin - s;
+        const b = p.bumper || 0;
+        if (t < b) return "pausa";
+        if (restante <= b) return "regresamos";
+        return "anuncio";
+    }
+    return "programa";
+}
+
 function actualizarSenal(){
     if (fechaDeHoy() !== diaMontado){
         construirParrilla();
         indiceEnAire = -1;
+        estadoActual = null;
         modoManual = false;
         pintarParrilla();
     }
 
     const i = indiceActual();
     const p = parrilla[i];
+    const s = ahora();
+    const t = s - p.inicio;
+    const estado = estadoDe(p, s);
 
-    if (i !== indiceEnAire){
+    if (i !== indiceEnAire || estado !== estadoActual){
         indiceEnAire = i;
-        if (!modoManual) reproducir(p, ahora() - p.inicio);
+        estadoActual = estado;
+
+        if (!modoManual){
+            if (estado === "pausa" || estado === "regresamos"){
+                actualizarSello(null, false);
+                mostrarBumper(estado);
+            } else {
+                ocultarBumper();
+                reproducir(p, estado === "anuncio" ? t - (p.bumper || 0) : t);
+            }
+        }
+
         pintarParrilla();
     }
 
@@ -696,9 +803,11 @@ function actualizarSenal(){
         $("nowTitle").textContent = p.titulo;
         $("nowDesc").textContent = p.descripcion;
         $("nowMeta").textContent = reloj(p.inicio) + " – " + reloj(p.fin) + " · " + largo(p.dur) + " · " + p.categoria;
+
+        const mostrarSello = estado === "programa" && t < DUR_CLASIFICACION;
+        actualizarSello(p.clasificacion, mostrarSello);
     }
 
-    const s = ahora();
     const avance = (s - p.inicio) / Math.max(1, p.fin - p.inicio);
     $("progress").style.width = Math.min(100, Math.max(0, avance*100)) + "%";
 
@@ -784,6 +893,8 @@ grid.addEventListener("click", e => {
     const enAire = idx === indiceActual();
 
     modoManual = !enAire;
+    ocultarBumper();
+    actualizarSello(null, false);
     reproducir(p, enAire ? ahora() - p.inicio : 0);
 
     $("nowTitle").textContent = p.titulo;
