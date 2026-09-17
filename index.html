@@ -125,12 +125,18 @@ a{color:inherit}
 
 .rating{
     position:absolute;top:14px;left:14px;z-index:5;
-    font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;
-    padding:6px 13px;border-radius:8px;
+    display:flex;flex-direction:column;gap:2px;
+    max-width:min(78%,340px);
+    padding:7px 13px;border-radius:8px;
     background:#FFCB56;color:#3a2410;
     box-shadow:0 4px 14px rgba(0,0,0,.4);
 }
+.rating-code{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em}
+.rating-desc{font-family:"Inter",sans-serif;font-size:11.5px;line-height:1.35;color:#3a2410;opacity:.85}
 .rating.b15{background:#FF7E7E;color:#3a0d10}
+.rating.b15 .rating-desc{color:#3a0d10}
+.rating.publicidad{background:#FFEDB9;color:#4a2410}
+.rating.publicidad .rating-desc{display:none}
 .rating.oculto{display:none}
 
 .bar{height:3px;background:var(--line-soft)}
@@ -324,7 +330,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
                         <p id="bumperTexto">Volvemos en un momento</p>
                     </div>
 
-                    <div class="rating oculto" id="rating">AA</div>
+                    <div class="rating oculto" id="rating">
+                        <span class="rating-code" id="ratingCode">AA</span>
+                        <span class="rating-desc" id="ratingDesc">Apto para todo público</span>
+                    </div>
                 </div>
 
                 <div class="bar"><span id="progress"></span></div>
@@ -562,7 +571,7 @@ const CATALOGO = [
     { titulo:"Pan de Muerto", descripcion:"Documental original de Cine Laptop.", categoria:"Documental", clasificacion:"AA",
       url:"https://www.youtube.com/embed/5X8gx_yEFLg", dur: 7*60 + 12 },
 
-    { titulo:"Pan de Muerto — Tráiler remasterizado", descripcion:"Adelanto de la nueva versión del documental.", categoria:"Documental", clasificacion:"AA",
+    { titulo:"Pan de Muerto Remaster 2026", descripcion:"Remasterización 2026 del documental original.", categoria:"Documental", clasificacion:"AA",
       url:"https://www.youtube.com/embed/DZT6qLmZT_0", dur: 6*60 + 41 },
 
     { titulo:"Pancracio 1", descripcion:"Primera entrega de la serie Pancracio.", categoria:"Cine", clasificacion:"B15",
@@ -772,6 +781,14 @@ const bumper = $("bumper");
 const bumperTitulo = $("bumperTitulo");
 const bumperTexto = $("bumperTexto");
 const rating = $("rating");
+const ratingCode = $("ratingCode");
+const ratingDesc = $("ratingDesc");
+
+/* Explicación de cada clasificación, para mostrar bajo el código */
+const CLASIFICACIONES = {
+    "AA": "Contenido apto para todo público.",
+    "B15": "Contenido para mayores de 15 años. Puede contener lenguaje inapropiado."
+};
 
 let conSonido = false;
 let enPantalla = null;
@@ -810,14 +827,16 @@ function ocultarBumper(){
     bumper.classList.add("oculto");
 }
 
-function actualizarSello(clasificacion, mostrar){
-    if (!mostrar || !clasificacion){
+function actualizarSello(datos){
+    if (!datos){
         rating.classList.add("oculto");
         return;
     }
-    rating.textContent = clasificacion;
-    rating.classList.toggle("b15", clasificacion === "B15");
+    ratingCode.textContent = datos.codigo;
+    ratingDesc.textContent = datos.texto || "";
     rating.classList.remove("oculto");
+    rating.classList.toggle("b15", datos.codigo === "B15");
+    rating.classList.toggle("publicidad", datos.codigo === "#Publicidad");
 }
 
 $("sound").addEventListener("click", e => {
@@ -961,7 +980,7 @@ function actualizarSenal(){
 
         if (!modoManual){
             if (estado === "pausa" || estado === "regresamos"){
-                actualizarSello(null, false);
+                actualizarSello(null);
                 mostrarBumper(estado);
             } else {
                 ocultarBumper();
@@ -977,8 +996,13 @@ function actualizarSenal(){
         $("nowDesc").textContent = p.descripcion;
         $("nowMeta").textContent = reloj(p.inicio) + " – " + reloj(p.fin) + " · " + largo(p.dur) + " · " + p.categoria;
 
-        const mostrarSello = estado === "programa" && t < DUR_CLASIFICACION;
-        actualizarSello(p.clasificacion, mostrarSello);
+        if (estado === "anuncio"){
+            actualizarSello({ codigo:"#Publicidad", texto:"" });
+        } else if (estado === "programa" && p.clasificacion && t < DUR_CLASIFICACION){
+            actualizarSello({ codigo: p.clasificacion, texto: CLASIFICACIONES[p.clasificacion] || "" });
+        } else {
+            actualizarSello(null);
+        }
     }
 
     const avance = (s - p.inicio) / Math.max(1, p.fin - p.inicio);
@@ -1074,7 +1098,7 @@ grid.addEventListener("click", e => {
 
     modoManual = !enAire;
     ocultarBumper();
-    actualizarSello(null, false);
+    actualizarSello(null);
     reproducir(p, enAire ? ahora() - p.inicio : 0);
 
     $("nowTitle").textContent = p.titulo;
