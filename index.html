@@ -140,6 +140,18 @@ a{color:inherit}
 .now-main{flex:1 1 260px;min-width:0}
 
 .onair{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--carmin);margin-bottom:9px}
+
+.viewers{
+    margin-left:8px;
+    padding-left:11px;
+    border-left:1px solid var(--line);
+    color:var(--ink-faint);
+    font-weight:500;
+    letter-spacing:normal;
+    text-transform:none;
+    font-variant-numeric:tabular-nums;
+}
+.viewers b{color:var(--ambar);font-weight:700}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--carmin);animation:pulse 2.4s infinite}
 @keyframes pulse{
     0%{box-shadow:0 0 0 0 rgba(170,28,65,.6)}
@@ -319,7 +331,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
                 <div class="now">
                     <div class="now-main">
-                        <div class="onair"><span class="dot"></span>EN VIVO</div>
+                        <div class="onair"><span class="dot"></span>EN VIVO<span class="viewers" id="viewers">— espectadores</span></div>
                         <h2 id="nowTitle">Sintonizando…</h2>
                         <p id="nowDesc">La emisión se calcula con la hora de tu dispositivo.</p>
                         <div class="now-meta tabular" id="nowMeta">—</div>
@@ -435,6 +447,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
 <script>
 /* =========================================================
    CINE LAPTOP TV — señal continua de 24 horas
@@ -449,6 +465,9 @@ const DIA = 86400;
 /* Duración de las pantallas "Pausa publicitaria" y "Regresamos", en segundos,
    al inicio y al final de cada corte publicitario. */
 const DUR_BUMPER = 4;
+
+/* Cuántos anuncios seguidos entran en cada corte publicitario */
+const ANUNCIOS_POR_CORTE = 2;
 
 /* Cuántos segundos se muestra el sello de clasificación al empezar cada programa */
 const DUR_CLASIFICACION = 8;
@@ -475,21 +494,60 @@ const ANUNCIOS = [
         titulo:"Publicidad",
         descripcion:"Corte publicitario de Cine Laptop TV.",
         categoria:"Publicidad",
+        plataforma:"youtube",
         url:"https://www.youtube.com/embed/8V-Vq2g8Ju4",
         dur: 2*60 + 42,
-        anuncio:true
+        anuncio:true,
+        activo:true
     },
     {
         titulo:"Publicidad",
         descripcion:"Corte publicitario de Cine Laptop TV.",
         categoria:"Publicidad",
+        plataforma:"youtube",
         url:"https://www.youtube.com/embed/Rkv9x5leGTM",
         dur: 60 + 10,
-        anuncio:true
+        anuncio:true,
+        activo:true
+    },
+
+    /* Anuncios de TikTok (@cinelaptop2), activados */
+    {
+        titulo:"La Simulación — Tráiler remaster",
+        descripcion:"Avance de Cine Laptop en TikTok.",
+        categoria:"Publicidad",
+        plataforma:"tiktok",
+        videoId:"7651822283547331858",
+        dur: 60 + 6,
+        anuncio:true,
+        activo:true
+    },
+    {
+        titulo:"Próximamente: Mil Máscaras",
+        descripcion:"Avance de Cine Laptop en TikTok.",
+        categoria:"Publicidad",
+        plataforma:"tiktok",
+        videoId:"7652911005571288328",
+        dur: 39,
+        anuncio:true,
+        activo:true
+    },
+    {
+        titulo:"Cine Tekton",
+        descripcion:"Avance de Cine Laptop en TikTok.",
+        categoria:"Publicidad",
+        plataforma:"tiktok",
+        videoId:"7686607044358901013",
+        dur: 30,
+        anuncio:true,
+        activo:true
     }
 ];
 
-const elegirAnuncio = () => ANUNCIOS[Math.floor(Math.random() * ANUNCIOS.length)];
+const elegirAnuncio = () => {
+    const activos = ANUNCIOS.filter(a => a.activo !== false);
+    return activos[Math.floor(Math.random() * activos.length)];
+};
 
 const HIMNO = {
     titulo:"Himno Nacional Mexicano",
@@ -558,8 +616,8 @@ function construirParrilla(){
     let vuelta = 0;
     let contador = 0;              /* cuenta programas (no anuncios) para el patrón 2+1 */
 
-    /* agenda un programa o corte, recortándolo si choca con un límite (medianoche o un especial) */
-    const agendarHasta = (base, durDeseada, limite, bumper) => {
+    /* agenda un programa o anuncio, recortándolo si choca con un límite (medianoche o un especial) */
+    const agendarHasta = (base, durDeseada, limite) => {
         if (cursor >= limite) return;
         const dur = Math.min(durDeseada, limite - cursor);
         parrilla.push({
@@ -567,9 +625,36 @@ function construirParrilla(){
             descripcion: base.descripcion,
             categoria: base.categoria,
             clasificacion: base.clasificacion || null,
-            url: base.url,
+            plataforma: base.plataforma || "youtube",
+            url: base.url || null,
+            videoId: base.videoId || null,
             anuncio: !!base.anuncio,
-            bumper: base.anuncio ? (bumper || 0) : 0,
+            bumper: false,
+            bumperTipo: null,
+            dur,
+            inicio: cursor,
+            fin: cursor + dur
+        });
+        cursor += dur;
+    };
+
+    /* agenda una pantalla de "pausa publicitaria" o "regresamos", sin video */
+    const agendarBumper = (tipo, limite) => {
+        if (cursor >= limite) return;
+        const dur = Math.min(DUR_BUMPER, limite - cursor);
+        parrilla.push({
+            titulo: tipo === "regresamos" ? "Regresamos" : "Pausa publicitaria",
+            descripcion: tipo === "regresamos"
+                ? "La programación continúa en un momento."
+                : "Corte publicitario de Cine Laptop TV.",
+            categoria:"Publicidad",
+            clasificacion:null,
+            plataforma:null,
+            url:null,
+            videoId:null,
+            anuncio:false,
+            bumper:true,
+            bumperTipo: tipo,
             dur,
             inicio: cursor,
             fin: cursor + dur
@@ -578,9 +663,7 @@ function construirParrilla(){
     };
 
     /* llena con la rotación normal desde "cursor" hasta "limite":
-       programa, programa, anuncio (al azar), programa, programa, anuncio...
-       cada anuncio lleva su pantalla de "pausa publicitaria" al inicio
-       y "regresamos" al final, sin recortar el anuncio en sí */
+       programa, programa, [pausa] anuncio, anuncio [regresamos], programa, programa... */
     const llenarHasta = limite => {
         while (cursor < limite){
             const base = CATALOGO[vuelta % CATALOGO.length];
@@ -589,8 +672,12 @@ function construirParrilla(){
             contador++;
 
             if (contador % 2 === 0 && cursor < limite){
-                const anuncio = elegirAnuncio();
-                agendarHasta(anuncio, anuncio.dur + 2 * DUR_BUMPER, limite, DUR_BUMPER);
+                agendarBumper("pausa", limite);
+                for (let k = 0; k < ANUNCIOS_POR_CORTE && cursor < limite; k++){
+                    const anuncio = elegirAnuncio();
+                    agendarHasta(anuncio, anuncio.dur, limite);
+                }
+                agendarBumper("regresamos", limite);
             }
         }
     };
@@ -610,9 +697,12 @@ function construirParrilla(){
             descripcion: especial.descripcion,
             categoria: especial.categoria || "Especial",
             clasificacion: especial.clasificacion || "AA",
+            plataforma: especial.plataforma || "youtube",
             url: especial.url,
+            videoId: especial.videoId || null,
             anuncio:false,
-            bumper:0,
+            bumper:false,
+            bumperTipo:null,
             dur: especial.fin - especial.inicio,
             inicio: especial.inicio,
             fin: especial.fin
@@ -626,7 +716,7 @@ function construirParrilla(){
     diaMontado = fechaHoy;
 
     $("factTitulos").textContent = (CATALOGO.length + 1) + " títulos";
-    $("factBloques").textContent = parrilla.filter(p => !p.anuncio).length + " emisiones";
+    $("factBloques").textContent = parrilla.filter(p => !p.anuncio && !p.bumper).length + " emisiones";
 
     if (especialesHoy.length){
         const detalle = especialesHoy
@@ -665,8 +755,13 @@ const $ = id => document.getElementById(id);
 
 const idDe = url => (url.match(/embed\/([\w-]+)/) || [,""])[1];
 
-function fuente(url, conSonido, desde){
-    const id = idDe(url);
+function fuente(programa, conSonido, desde){
+    if (programa.plataforma === "tiktok"){
+        /* El embed oficial de TikTok no soporta mute/start por URL: siempre
+           arranca desde el principio del video. */
+        return "https://www.tiktok.com/embed/v2/" + programa.videoId;
+    }
+    const id = idDe(programa.url);
     return "https://www.youtube.com/embed/" + id +
         "?autoplay=1&mute=" + (conSonido ? 0 : 1) +
         "&rel=0&modestbranding=1&playsinline=1&start=" + Math.max(0, Math.floor(desde || 0));
@@ -690,7 +785,7 @@ function reproducir(programa, desde){
     desdePantalla = desde || 0;
     videoHost.innerHTML = "";
     const f = document.createElement("iframe");
-    f.src = fuente(programa.url, conSonido, desdePantalla);
+    f.src = fuente(programa, conSonido, desdePantalla);
     f.title = programa.titulo;
     f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
     f.referrerPolicy = "strict-origin-when-cross-origin";
@@ -734,7 +829,7 @@ $("sound").addEventListener("click", e => {
     }
     if (estadoActual === "pausa" || estadoActual === "regresamos") return;
     const p = parrilla[indiceActual()];
-    reproducir(p, ahora() - p.inicio - (p.bumper || 0));
+    reproducir(p, ahora() - p.inicio);
 });
 
 /* pantalla completa */
@@ -753,17 +848,95 @@ document.addEventListener("fullscreenchange", () => {
     full.textContent = document.fullscreenElement ? "Salir de pantalla completa" : "Pantalla completa";
 });
 
+/* ---------- espectadores (simulado) ---------- */
+/*
+   No hay backend conectado, así que este número no cuenta gente real:
+   se mueve solo dentro de un rango fijo según la hora del día.
+
+   Rangos (hora local del dispositivo de quien mira):
+     12:00–15:00  → 10 a 15
+     21:00–06:00  → 0 a 2
+     el resto     → 3 a 5
+
+   Para conectarlo a espectadores reales más adelante, solo hay que
+   reemplazar esta función por una que lea el dato real, sin tocar
+   el resto del canal.
+*/
+
+function rangoDeHora(hora){
+    if (hora >= 12 && hora < 15) return [10, 15];
+    if (hora >= 21 || hora < 6) return [0, 2];
+    return [3, 5];
+}
+
+function espectadoresEstimados(){
+    const [min, max] = rangoDeHora(new Date().getHours());
+    return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function actualizarEspectadores(){
+    const n = espectadoresEstimados();
+    $("viewers").innerHTML = "<b>" + n.toLocaleString("es-MX") + "</b> viendo ahora";
+}
+
+/* ---------- espectadores reales (Firebase, opcional) ---------- */
+/*
+   Si esto conecta bien, reemplaza al contador simulado de arriba con
+   gente real conectada. Si no conecta (URL incorrecta, reglas sin
+   publicar, sin internet, etc.) no pasa nada: el canal se queda con
+   el número simulado, sin errores visibles para el visitante.
+
+   firebaseConfig es el que pegaste. databaseURL es una suposición
+   (el formato más común para proyectos nuevos); si tu Realtime
+   Database quedó en otra región, cámbiala por la que te muestra
+   la consola arriba de la tabla de datos.
+*/
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCxGBIR80lDFrigi-EpRNeltNe68WmXAuY",
+    authDomain: "cine-laptop-tv.firebaseapp.com",
+    databaseURL: "https://cine-laptop-tv-default-rtdb.firebaseio.com",
+    projectId: "cine-laptop-tv",
+    storageBucket: "cine-laptop-tv.firebasestorage.app",
+    messagingSenderId: "448847613361",
+    appId: "1:448847613361:web:e088f749b5f2a7160c4190"
+};
+
+(function conectarEspectadoresReales(){
+    if (typeof firebase === "undefined") return;
+
+    try {
+        firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+        console.warn("Firebase no se pudo inicializar, se queda el contador simulado.", e);
+        return;
+    }
+
+    const listo = firebase.auth().signInAnonymously()
+        .then(cred => {
+            const presenciaRef = firebase.database().ref("presencia/" + cred.user.uid);
+            presenciaRef.set(true);
+            presenciaRef.onDisconnect().remove();
+
+            firebase.database().ref("presencia").on("value", snap => {
+                clearInterval(intervaloEspectadoresSimulado);
+                const n = Math.max(1, snap.numChildren());
+                $("viewers").innerHTML = "<b>" + n.toLocaleString("es-MX") + "</b> viendo ahora";
+            });
+        })
+        .catch(err => {
+            console.warn("No se pudo conectar a Firebase, se queda el contador simulado.", err);
+        });
+
+    /* si no responde en 8 segundos, se asume que no va a conectar y seguimos con el simulado */
+    setTimeout(() => { listo.catch(() => {}); }, 8000);
+})();
+
 /* ---------- señal en vivo ---------- */
 
-function estadoDe(p, s){
-    if (p.anuncio){
-        const t = s - p.inicio;
-        const restante = p.fin - s;
-        const b = p.bumper || 0;
-        if (t < b) return "pausa";
-        if (restante <= b) return "regresamos";
-        return "anuncio";
-    }
+function estadoDe(p){
+    if (p.bumper) return p.bumperTipo;   /* "pausa" | "regresamos" */
+    if (p.anuncio) return "anuncio";
     return "programa";
 }
 
@@ -780,7 +953,7 @@ function actualizarSenal(){
     const p = parrilla[i];
     const s = ahora();
     const t = s - p.inicio;
-    const estado = estadoDe(p, s);
+    const estado = estadoDe(p);
 
     if (i !== indiceEnAire || estado !== estadoActual){
         indiceEnAire = i;
@@ -792,7 +965,7 @@ function actualizarSenal(){
                 mostrarBumper(estado);
             } else {
                 ocultarBumper();
-                reproducir(p, estado === "anuncio" ? t - (p.bumper || 0) : t);
+                reproducir(p, t);
             }
         }
 
@@ -815,7 +988,10 @@ function actualizarSenal(){
     $("countdown").textContent = largo(restante);
 
     const cola = [];
-    for (let k = 1; k <= 4; k++) cola.push(parrilla[(i + k) % parrilla.length]);
+    for (let k = 1; cola.length < 4 && k < parrilla.length; k++){
+        const item = parrilla[(i + k) % parrilla.length];
+        if (!item.bumper) cola.push(item);
+    }
 
     $("queue").innerHTML = cola.map(x => `
         <li>
@@ -843,11 +1019,15 @@ let desdeAhora = true;
 
 function filtrados(){
     const texto = $("search").value.toLowerCase().trim();
-    let lista = parrilla.map((p, i) => ({ ...p, i }));
+    let lista = parrilla.map((p, i) => ({ ...p, i })).filter(p => !p.bumper);
 
     if (desdeAhora && !texto && categoria === "Todos"){
-        const i = indiceActual();
-        lista = lista.slice(i).concat(lista.slice(0, i));
+        const actual = indiceActual();
+        lista = lista.slice().sort((a, b) => {
+            const da = (a.i - actual + parrilla.length) % parrilla.length;
+            const db = (b.i - actual + parrilla.length) % parrilla.length;
+            return da - db;
+        });
     }
 
     return lista.filter(p =>
@@ -952,7 +1132,9 @@ function aviso(texto){
 construirParrilla();
 actualizarSenal();
 pintarParrilla();
+actualizarEspectadores();
 setInterval(actualizarSenal, 1000);
+const intervaloEspectadoresSimulado = setInterval(actualizarEspectadores, 7000);
 </script>
 
 </body>
