@@ -553,9 +553,11 @@ const ANUNCIOS = [
     }
 ];
 
-const elegirAnuncio = () => {
+/* elige "cantidad" anuncios sin repetir dentro del mismo corte (si hay suficientes activos) */
+const elegirAnunciosCorte = cantidad => {
     const activos = ANUNCIOS.filter(a => a.activo !== false);
-    return activos[Math.floor(Math.random() * activos.length)];
+    const barajado = activos.slice().sort(() => Math.random() - 0.5);
+    return barajado.slice(0, Math.min(cantidad, barajado.length));
 };
 
 const HIMNO = {
@@ -682,9 +684,9 @@ function construirParrilla(){
 
             if (contador % 2 === 0 && cursor < limite){
                 agendarBumper("pausa", limite);
-                for (let k = 0; k < ANUNCIOS_POR_CORTE && cursor < limite; k++){
-                    const anuncio = elegirAnuncio();
-                    agendarHasta(anuncio, anuncio.dur, limite);
+                const anuncios = elegirAnunciosCorte(ANUNCIOS_POR_CORTE);
+                for (let k = 0; k < anuncios.length && cursor < limite; k++){
+                    agendarHasta(anuncios[k], anuncios[k].dur, limite);
                 }
                 agendarBumper("regresamos", limite);
             }
