@@ -98,7 +98,10 @@ a{color:inherit}
 
 .screen{position:relative;aspect-ratio:16/9;background:#000}
 .video-host{position:absolute;inset:0}
-.video-host iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.capa{position:absolute;inset:0;display:none}
+.capa.activa{display:block}
+.capa iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+#ytHost{position:absolute;inset:0}
 
 .screen-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--ink-faint);gap:10px}
 .screen-empty img{width:54px;height:54px;margin:0 auto;opacity:.8}
@@ -319,9 +322,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
             <div class="stage" id="stage">
                 <div class="screen" id="screen">
                     <div class="video-host" id="videoHost">
-                        <div class="screen-empty">
-                            <img src="https://www.gstatic.com/android/keyboard/emojikitchen/20240530/u1f4bb/u1f4bb_u1f3ac.png" alt="">
-                            <p>Sintonizando la señal…</p>
+                        <div class="capa" id="ytCapa"><div id="ytHost"></div></div>
+                        <div class="capa" id="otroHost">
+                            <div class="screen-empty">
+                                <img src="https://www.gstatic.com/android/keyboard/emojikitchen/20240530/u1f4bb/u1f4bb_u1f3ac.png" alt="">
+                                <p>Sintonizando la señal…</p>
+                            </div>
                         </div>
                     </div>
 
@@ -459,6 +465,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
 /* =========================================================
@@ -607,9 +615,26 @@ const CATALOGO = [
 
 /* ---------- armado de la parrilla ---------- */
 
+/* El canal siempre corre con la hora de Ciudad de México, sin importar
+   cómo tenga configurado el reloj o la zona horaria cada dispositivo,
+   para que todos vean exactamente el mismo programa al mismo tiempo. */
+const ZONA_CANAL = "America/Mexico_City";
+
+function partesHoraCanal(){
+    const partes = new Intl.DateTimeFormat("en-US", {
+        timeZone: ZONA_CANAL, hourCycle:"h23",
+        year:"numeric", month:"2-digit", day:"2-digit",
+        hour:"2-digit", minute:"2-digit", second:"2-digit"
+    }).formatToParts(new Date());
+
+    const obj = {};
+    partes.forEach(p => { obj[p.type] = p.value; });
+    return obj;
+}
+
 const fechaDeHoy = () => {
-    const d = new Date();
-    return d.getFullYear() + "-" + dosDig(d.getMonth() + 1) + "-" + dosDig(d.getDate());
+    const p = partesHoraCanal();
+    return p.year + "-" + p.month + "-" + p.day;
 };
 
 let parrilla = [];
@@ -750,8 +775,8 @@ const largo = s => (s >= 3600 ? Math.floor(s/3600) + ":" + dosDig(Math.floor(s/6
                               : Math.floor(s/60) + ":" + dosDig(s%60));
 
 const ahora = () => {
-    const d = new Date();
-    return d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds();
+    const p = partesHoraCanal();
+    return Number(p.hour) * 3600 + Number(p.minute) * 60 + Number(p.second);
 };
 
 const indiceActual = () => {
@@ -766,19 +791,8 @@ const $ = id => document.getElementById(id);
 
 const idDe = url => (url.match(/embed\/([\w-]+)/) || [,""])[1];
 
-function fuente(programa, conSonido, desde){
-    if (programa.plataforma === "tiktok"){
-        /* El embed oficial de TikTok no soporta mute/start por URL: siempre
-           arranca desde el principio del video. */
-        return "https://www.tiktok.com/embed/v2/" + programa.videoId;
-    }
-    const id = idDe(programa.url);
-    return "https://www.youtube.com/embed/" + id +
-        "?autoplay=1&mute=" + (conSonido ? 0 : 1) +
-        "&rel=0&modestbranding=1&playsinline=1&start=" + Math.max(0, Math.floor(desde || 0));
-}
-
-const videoHost = $("videoHost");
+const ytCapa = $("ytCapa");
+const otroHost = $("otroHost");
 const bumper = $("bumper");
 const bumperTitulo = $("bumperTitulo");
 const bumperTexto = $("bumperTexto");
@@ -799,20 +813,101 @@ let modoManual = false;
 let indiceEnAire = -1;
 let estadoActual = null;
 
+/* Corrección de atraso: si el video de YouTube se desfasa más de esto
+   respecto al reloj del canal, se adelanta solo para volver a cuadrar. */
+const UMBRAL_DESFASE = 3;
+
+let ytPlayer = null;
+let ytListo = false;
+let ytPendiente = null;   /* { videoId, inicioSeg } si algo quiso reproducirse antes de que cargara la API */
+
+function mostrarCapa(cual){
+    ytCapa.classList.toggle("activa", cual === "yt");
+    otroHost.classList.toggle("activa", cual === "otro");
+}
+
+function aplicarSonidoYT(){
+    if (!ytPlayer || typeof ytPlayer.mute !== "function") return;
+    if (conSonido) ytPlayer.unMute(); else ytPlayer.mute();
+}
+
+function crearReproductorYT(videoId, inicioSeg){
+    mostrarCapa("yt");
+    ytPlayer = new YT.Player("ytHost", {
+        width:"100%",
+        height:"100%",
+        videoId,
+        playerVars:{
+            autoplay:1, controls:0, modestbranding:1, rel:0,
+            playsinline:1, disablekb:1, iv_load_policy:3,
+            start: Math.max(0, Math.floor(inicioSeg || 0))
+        },
+        events:{
+            onReady: e => { aplicarSonidoYT(); e.target.playVideo(); }
+        }
+    });
+}
+
+function reproducirYouTube(url, inicioSeg){
+    const videoId = idDe(url);
+
+    if (!ytListo){
+        ytPendiente = { videoId, inicioSeg };
+        otroHost.innerHTML = '<div class="screen-empty"><p>Cargando reproductor…</p></div>';
+        mostrarCapa("otro");
+        return;
+    }
+
+    if (!ytPlayer){
+        crearReproductorYT(videoId, inicioSeg);
+        return;
+    }
+
+    mostrarCapa("yt");
+    ytPlayer.loadVideoById({ videoId, startSeconds: Math.max(0, Math.floor(inicioSeg || 0)) });
+    aplicarSonidoYT();
+}
+
+/* Llamada por el <script src="https://www.youtube.com/iframe_api"> al terminar de cargar */
+window.onYouTubeIframeAPIReady = function(){
+    ytListo = true;
+    if (ytPendiente){
+        const { videoId, inicioSeg } = ytPendiente;
+        ytPendiente = null;
+        crearReproductorYT(videoId, inicioSeg);
+    }
+};
+
+function reproducirTikTok(programa){
+    /* El embed oficial de TikTok no da control por JavaScript: siempre
+       arranca desde el principio y no se puede silenciar desde aquí. */
+    otroHost.innerHTML =
+        '<iframe src="https://www.tiktok.com/embed/v2/' + programa.videoId + '" ' +
+        'title="' + programa.titulo.replace(/"/g, "") + '" ' +
+        'allow="autoplay; encrypted-media; clipboard-write" allowfullscreen></iframe>';
+    mostrarCapa("otro");
+}
+
+function detenerReproduccion(){
+    if (ytPlayer && typeof ytPlayer.pauseVideo === "function"){
+        try { ytPlayer.pauseVideo(); } catch (e) {}
+    }
+    otroHost.innerHTML = "";
+}
+
 function reproducir(programa, desde){
     enPantalla = programa;
     desdePantalla = desde || 0;
-    videoHost.innerHTML = "";
-    const f = document.createElement("iframe");
-    f.src = fuente(programa, conSonido, desdePantalla);
-    f.title = programa.titulo;
-    f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-    f.referrerPolicy = "strict-origin-when-cross-origin";
-    f.allowFullscreen = true;
-    videoHost.appendChild(f);
+
+    if (programa.plataforma === "tiktok"){
+        reproducirTikTok(programa);
+    } else {
+        reproducirYouTube(programa.url, desdePantalla);
+    }
 }
 
 function mostrarBumper(tipo){
+    detenerReproduccion();
     bumper.classList.remove("oculto");
     if (tipo === "regresamos"){
         bumper.classList.add("regresamos");
@@ -844,13 +939,7 @@ function actualizarSello(datos){
 $("sound").addEventListener("click", e => {
     conSonido = !conSonido;
     e.currentTarget.textContent = conSonido ? "Silenciar" : "Activar sonido";
-    if (modoManual){
-        if (enPantalla) reproducir(enPantalla, desdePantalla);
-        return;
-    }
-    if (estadoActual === "pausa" || estadoActual === "regresamos") return;
-    const p = parrilla[indiceActual()];
-    reproducir(p, ahora() - p.inicio);
+    if (enPantalla && enPantalla.plataforma !== "tiktok") aplicarSonidoYT();
 });
 
 /* pantalla completa */
@@ -1005,6 +1094,19 @@ function actualizarSenal(){
         } else {
             actualizarSello(null);
         }
+
+        /* si el video de YouTube se atrasó (buffering, anuncios de YouTube, etc.)
+           se adelanta solo para volver a cuadrar con el reloj del canal */
+        if ((estado === "programa" || estado === "anuncio") &&
+            ytPlayer && typeof ytPlayer.getCurrentTime === "function" &&
+            enPantalla && enPantalla.plataforma !== "tiktok"){
+            try {
+                const real = ytPlayer.getCurrentTime();
+                if (Math.abs(real - t) > UMBRAL_DESFASE){
+                    ytPlayer.seekTo(t, true);
+                }
+            } catch (e) {}
+        }
     }
 
     const avance = (s - p.inicio) / Math.max(1, p.fin - p.inicio);
@@ -1029,8 +1131,7 @@ function actualizarSenal(){
         </li>
     `).join("");
 
-    const d = new Date();
-    $("clock").textContent = dosDig(d.getHours()) + ":" + dosDig(d.getMinutes()) + ":" + dosDig(d.getSeconds());
+    $("clock").textContent = reloj(s);
 }
 
 /* ---------- parrilla en pantalla ---------- */
