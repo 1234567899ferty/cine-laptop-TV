@@ -495,7 +495,18 @@ const DUR_CLASIFICACION = 8;
    cambiar de día, la parrilla vuelve sola al horario normal.
    Para agregar otra, copia un objeto y cambia sus datos.
 --------------------------------------------------------- */
-const ESPECIALES = [];
+const ESPECIALES = [
+    {
+        fecha:"2026-09-22",
+        inicio: 21*3600,
+        fin: 21*3600 + 51,                     /* 21:00:00 – 21:00:51 */
+        titulo:"GRAN ESTRENO",
+        descripcion:"Gran estreno de \"La Leyenda del Caballero de Plata\", corto en pixel art de Cine Laptop.",
+        categoria:"Especial",
+        clasificacion:"AA",
+        url:"https://www.youtube.com/embed/14cL63_ubdE"
+    }
+];
 
 /* Margen extra por programa (en segundos), solo para fechas listadas aquí */
 const MARGENES = {
@@ -610,7 +621,16 @@ const CATALOGO = [
       url:"https://www.youtube.com/embed/z8UWk_M1bJA", dur: 12 },
 
     { titulo:"Carnaval de Tlaxcala", descripcion:"Documental de Cine Laptop sobre el Carnaval de Tlaxcala.", categoria:"Documental", clasificacion:"AA",
-      url:"https://www.youtube.com/embed/ItAyKz9irlE", dur: 24*60 + 1 }
+      url:"https://www.youtube.com/embed/ItAyKz9irlE", dur: 24*60 + 1 },
+
+    { titulo:"La Leyenda del Caballero de Plata", descripcion:"Corto en pixel art de Cine Laptop.", categoria:"Cine", clasificacion:"AA",
+      url:"https://www.youtube.com/embed/14cL63_ubdE", dur: 51 },
+
+    { titulo:"Macarena Stop Motion", descripcion:"Animación stop motion de Cine Laptop.", categoria:"Cine", clasificacion:"AA",
+      url:"https://www.youtube.com/embed/fcPzgnMxAuQ", dur: 12 },
+
+    { titulo:"Mi Primer Stop Motion", descripcion:"Animación stop motion de Cine Laptop.", categoria:"Cine", clasificacion:"AA",
+      url:"https://www.youtube.com/embed/XwBTnwutsVU", dur: 10 }
 ];
 
 /* ---------- armado de la parrilla ---------- */
