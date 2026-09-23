@@ -842,6 +842,8 @@ const UMBRAL_DESFASE = 3;
 let ytPlayer = null;
 let ytListo = false;
 let ytPendiente = null;   /* { videoId, inicioSeg } si algo quiso reproducirse antes de que cargara la API */
+let ytApiFallo = false;   /* si la API nunca respondió, se deja de esperarla el resto de la sesión */
+let ytEsperaTimer = null;
 
 function mostrarCapa(cual){
     ytCapa.classList.toggle("activa", cual === "yt");
@@ -870,13 +872,40 @@ function crearReproductorYT(videoId, inicioSeg){
     });
 }
 
+/* Plan B: si la API oficial no carga (bloqueador de anuncios, extensión, red lenta),
+   se reproduce igual con un iframe simple, sin corrección de atraso ni control de sonido. */
+function reproducirYouTubeSimple(url, inicioSeg){
+    const id = idDe(url);
+    otroHost.innerHTML =
+        '<iframe src="https://www.youtube.com/embed/' + id +
+        '?autoplay=1&mute=' + (conSonido ? 0 : 1) +
+        '&rel=0&modestbranding=1&playsinline=1&start=' + Math.max(0, Math.floor(inicioSeg || 0)) +
+        '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+        'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    mostrarCapa("otro");
+}
+
 function reproducirYouTube(url, inicioSeg){
+    if (ytApiFallo){
+        reproducirYouTubeSimple(url, inicioSeg);
+        return;
+    }
+
     const videoId = idDe(url);
 
     if (!ytListo){
         ytPendiente = { videoId, inicioSeg };
         otroHost.innerHTML = '<div class="screen-empty"><p>Cargando reproductor…</p></div>';
         mostrarCapa("otro");
+
+        clearTimeout(ytEsperaTimer);
+        ytEsperaTimer = setTimeout(() => {
+            if (ytListo) return;   /* cargó justo a tiempo, no hay que hacer nada */
+            ytApiFallo = true;
+            ytPendiente = null;
+            reproducirYouTubeSimple(url, inicioSeg);
+        }, 4000);
+
         return;
     }
 
@@ -893,6 +922,7 @@ function reproducirYouTube(url, inicioSeg){
 /* Llamada por el <script src="https://www.youtube.com/iframe_api"> al terminar de cargar */
 window.onYouTubeIframeAPIReady = function(){
     ytListo = true;
+    clearTimeout(ytEsperaTimer);
     if (ytPendiente){
         const { videoId, inicioSeg } = ytPendiente;
         ytPendiente = null;
