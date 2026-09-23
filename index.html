@@ -504,7 +504,9 @@ const ESPECIALES = [
         descripcion:"Gran estreno de \"La Leyenda del Caballero de Plata\", corto en pixel art de Cine Laptop.",
         categoria:"Especial",
         clasificacion:"AA",
-        url:"https://www.youtube.com/embed/14cL63_ubdE"
+        url:"https://www.youtube.com/embed/14cL63_ubdE",
+        picoMax: 24,
+        picoDuracion: 2 * 60          /* el contador de espectadores sube hasta 24 durante estos 2 minutos */
     }
 ];
 
@@ -981,12 +983,17 @@ document.addEventListener("fullscreenchange", () => {
 /* ---------- espectadores (simulado) ---------- */
 /*
    No hay backend conectado, así que este número no cuenta gente real:
-   se mueve solo dentro de un rango fijo según la hora del día.
+   se mueve solo dentro de un rango fijo según la hora del canal
+   (Ciudad de México, la misma que usa toda la programación).
 
-   Rangos (hora local del dispositivo de quien mira):
+   Rangos normales:
      12:00–15:00  → 10 a 15
      21:00–06:00  → 0 a 2
      el resto     → 3 a 5
+
+   Además, una transmisión especial puede traer su propio "pico" de
+   espectadores (por ejemplo, un estreno): mientras dura ese pico, el
+   número sube hasta su máximo en vez de usar el rango normal.
 
    Para conectarlo a espectadores reales más adelante, solo hay que
    reemplazar esta función por una que lea el dato real, sin tocar
@@ -999,8 +1006,22 @@ function rangoDeHora(hora){
     return [3, 5];
 }
 
+function picoDeEspectadoresActivo(){
+    const fechaHoy = fechaDeHoy();
+    const s = ahora();
+    return ESPECIALES.find(e =>
+        e.fecha === fechaHoy && e.picoMax &&
+        s >= e.inicio && s < e.inicio + (e.picoDuracion || 0)
+    );
+}
+
 function espectadoresEstimados(){
-    const [min, max] = rangoDeHora(new Date().getHours());
+    const pico = picoDeEspectadoresActivo();
+    if (pico){
+        const min = Math.max(1, pico.picoMax - 6);
+        return min + Math.floor(Math.random() * (pico.picoMax - min + 1));
+    }
+    const [min, max] = rangoDeHora(Math.floor(ahora() / 3600));
     return min + Math.floor(Math.random() * (max - min + 1));
 }
 
